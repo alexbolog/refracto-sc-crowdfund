@@ -17,8 +17,15 @@
 
 multiversx_sc::imports!();
 
+mod admin;
+mod kyc;
+mod storage;
+pub mod types;
+
 #[multiversx_sc::contract]
-pub trait LoanCrowdfundScContract {
+pub trait LoanCrowdfundScContract:
+    admin::AdminModule + storage::config::ConfigModule + kyc::KycModule
+{
     #[init]
     fn init(&self) {}
 }

@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                            0
+// Endpoints:                            7
 // Async Callback (empty):               1
-// Total number of exported functions:   2
+// Total number of exported functions:   9
 
 #![no_std]
 
@@ -22,6 +22,13 @@ multiversx_sc_wasm_adapter::endpoints! {
     loan_crowdfund_sc
     (
         init => init
+        getAdminList => admin_list
+        getWithdrawFromLoanTimeSpan => withdraw_from_loan_timespan
+        getLoanShareTokenIdentifiers => loan_share_token_identifiers
+        getCrowdfundingState => crowdfunding_state
+        getIsKycCompliant => get_is_kyc_compliant
+        registerSuccessfulKyc => register_successful_kyc
+        getWhitelistedUsers => whitelisted_users
     )
 }
 
