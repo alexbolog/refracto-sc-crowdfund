@@ -6,7 +6,7 @@ use crate::test_state::{LoanCfTestState, ACCOUNT_BALANCE_EXPR, INVESTOR_1_ADDRES
 fn successful_cool_off_withdrawal() {
     let mut state = LoanCfTestState::new();
     state.deploy_contract();
-    state.create_valid_mockup_project();
+    state.create_fully_mocked_project();
     state.set_block_timestamp("101");
     state.invest(INVESTOR_1_ADDRESS_EXPR, 1000, 1);
     state.set_block_timestamp("102");
@@ -21,7 +21,7 @@ fn successful_cool_off_withdrawal() {
 fn successful_cool_off_withdrawal_with_multiple_investments() {
     let mut state = LoanCfTestState::new();
     state.deploy_contract();
-    state.create_valid_mockup_project();
+    state.create_fully_mocked_project();
     state.set_block_timestamp("101");
     state.invest(INVESTOR_1_ADDRESS_EXPR, 1000, 1);
     state.invest(INVESTOR_1_ADDRESS_EXPR, 1000, 1);
@@ -37,8 +37,8 @@ fn successful_cool_off_withdrawal_with_multiple_investments() {
 fn successful_cool_off_withdrawal_with_investment_in_multiple_projects() {
     let mut state = LoanCfTestState::new();
     state.deploy_contract();
-    state.create_valid_mockup_project();
-    state.create_valid_mockup_project_explicit_project_id(2);
+    state.create_fully_mocked_project();
+    state.create_mocked_project_explicit_proj_id(2);
     state.set_block_timestamp("101");
     state.invest(INVESTOR_1_ADDRESS_EXPR, 1000, 1);
     state.invest(INVESTOR_1_ADDRESS_EXPR, 1000, 2);
@@ -56,7 +56,7 @@ fn successful_cool_off_withdrawal_with_investment_in_multiple_projects() {
 fn failed_withdrawal_after_cool_off_period() {
     let mut state = LoanCfTestState::new();
     state.deploy_contract();
-    state.create_valid_mockup_project();
+    state.create_fully_mocked_project();
     state.set_block_timestamp("101");
     state.invest(INVESTOR_1_ADDRESS_EXPR, 1000, 1);
     state.set_block_timestamp("10001");

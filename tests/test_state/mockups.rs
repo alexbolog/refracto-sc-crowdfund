@@ -20,23 +20,34 @@ use super::{
 };
 
 impl LoanCfTestState {
-    pub fn create_valid_mockup_project(&mut self) {
-        self.create_valid_mockup_project_explicit_project_id(1);
+    pub fn create_fully_mocked_project(&mut self) {
+        self.create_mocked_project_explicit_proj_id(1);
     }
 
-    pub fn create_valid_mockup_project_explicit_project_id(&mut self, project_id: u64) {
+    pub fn create_mocked_project_explicit_proj_id(&mut self, project_id: u64) {
+        self.create_mocked_project_explicit_financing_details(project_id, 90000, 10000, 100, 100);
+    }
+
+    pub fn create_mocked_project_explicit_financing_details(
+        &mut self,
+        project_id: u64,
+        principal_min: u64,
+        principal_max: u64,
+        daily_interest_rate: u64,
+        daily_penalty_fee: u64,
+    ) {
         self.create_project(
             project_id,
             "TEST PROJ",
             USDC_TOKEN_ID,
-            100,
-            100,
+            daily_interest_rate,
+            daily_penalty_fee,
             self.beneficiary_address.clone(),
             1,
             100,
             10000,
-            90000,
-            100000,
+            principal_min,
+            principal_max,
         );
     }
 }
