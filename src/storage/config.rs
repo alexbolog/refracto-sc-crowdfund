@@ -1,6 +1,6 @@
 multiversx_sc::imports!();
 
-use crate::types::crowdfunding_state::CrowdfundingState;
+use crate::types::crowdfunding_state::CrowdfundingStateContext;
 
 #[multiversx_sc::module]
 pub trait ConfigModule {
@@ -17,5 +17,5 @@ pub trait ConfigModule {
     fn crowdfunding_state(
         &self,
         project_id: u64,
-    ) -> SingleValueMapper<CrowdfundingState<Self::Api>>;
+    ) -> SingleValueMapper<CrowdfundingStateContext<Self::Api>>;
 }
