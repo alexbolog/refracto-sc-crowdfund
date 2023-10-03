@@ -28,9 +28,9 @@
 
 multiversx_sc::imports!();
 
-mod admin;
-mod beneficiary;
-mod common;
+pub mod admin;
+pub mod beneficiary;
+pub mod common;
 mod kyc;
 mod permissions;
 mod storage;
