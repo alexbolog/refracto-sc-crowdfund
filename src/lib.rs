@@ -28,7 +28,8 @@
 
 multiversx_sc::imports!();
 
-pub mod admin;
+mod admin;
+mod beneficiary;
 mod kyc;
 mod permissions;
 mod storage;
@@ -36,7 +37,11 @@ pub mod types;
 
 #[multiversx_sc::contract]
 pub trait LoanCrowdfundScContract:
-    permissions::PermissionsModule + storage::config::ConfigModule + kyc::KycModule + admin::AdminModule
+    permissions::PermissionsModule
+    + storage::config::ConfigModule
+    + kyc::KycModule
+    + admin::AdminModule
+    + beneficiary::BeneficiaryModule
 {
     #[init]
     fn init(&self) {}
