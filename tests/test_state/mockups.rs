@@ -25,7 +25,14 @@ impl LoanCfTestState {
     }
 
     pub fn create_mocked_project_explicit_proj_id(&mut self, project_id: u64) {
-        self.create_mocked_project_explicit_financing_details(project_id, 90000, 10000, 100, 100);
+        self.create_mocked_project_explicit_financing_details(
+            project_id,
+            90000,
+            10000,
+            100,
+            100,
+            12 * 30 * 24 * 60 * 60, // one year
+        );
     }
 
     pub fn create_mocked_project_explicit_financing_details(
@@ -35,6 +42,7 @@ impl LoanCfTestState {
         principal_max: u64,
         daily_interest_rate: u64,
         daily_penalty_fee: u64,
+        loan_duration: u64,
     ) {
         self.create_project(
             project_id,
@@ -48,6 +56,7 @@ impl LoanCfTestState {
             10000,
             principal_min,
             principal_max,
+            loan_duration,
         );
     }
 }
