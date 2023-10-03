@@ -27,10 +27,10 @@
 #![no_std]
 
 multiversx_sc::imports!();
-
 pub mod admin;
 pub mod beneficiary;
 pub mod common;
+pub mod constants;
 mod kyc;
 mod permissions;
 mod storage;
@@ -50,7 +50,7 @@ pub trait LoanCrowdfundScContract:
 
     #[payable("*")]
     #[endpoint(invest)]
-    fn invest(&self) {
+    fn invest(&self, project_id: u64) {
         let caller = self.blockchain().get_caller();
         self.require_address_is_kyc_compliant(&caller);
     }
