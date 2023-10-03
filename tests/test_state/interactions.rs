@@ -143,6 +143,7 @@ impl LoanCfTestState {
         cf_end_timestamp: u64,
         cf_target_min: u64,
         cf_target_max: u64,
+        loan_duration: u64,
     ) {
         self.world
             .sc_call(ScCallStep::new().from(OWNER_ADDRESS_EXPR).call(
@@ -158,6 +159,7 @@ impl LoanCfTestState {
                     cf_end_timestamp,
                     cf_target_min,
                     cf_target_max,
+                    loan_duration,
                 ),
             ));
     }
