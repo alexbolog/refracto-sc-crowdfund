@@ -1,7 +1,7 @@
 multiversx_sc::imports!();
 
 #[multiversx_sc::module]
-pub trait KycModule: crate::admin::AdminModule {
+pub trait KycModule: crate::permissions::PermissionsModule {
     #[view(getIsKycCompliant)]
     fn get_is_kyc_compliant(&self, address: &ManagedAddress) -> bool {
         self.whitelisted_users().contains(address)
