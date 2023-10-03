@@ -3,6 +3,7 @@ use test_state::{
     LoanCfTestState, ACCOUNT_BALANCE_EXPR, INVESTOR_1_ADDRESS_EXPR, LOAN_SHARES_ID, USDC_TOKEN_ID,
 };
 
+mod invest;
 mod project_funding_state;
 mod test_state;
 
@@ -29,7 +30,7 @@ fn test_invest() {
 
     state.create_valid_mockup_project();
 
-    state.invest(INVESTOR_1_ADDRESS_EXPR, 100);
+    state.invest(INVESTOR_1_ADDRESS_EXPR, 100, 1);
     state.check_investor_share_balance(INVESTOR_1_ADDRESS_EXPR, "1", "1");
 }
 
@@ -48,7 +49,7 @@ fn claim_cancelled_project_funds() {
     let mut state = LoanCfTestState::new();
     state.deploy_contract();
     state.create_valid_mockup_project();
-    state.invest(INVESTOR_1_ADDRESS_EXPR, 100);
+    state.invest(INVESTOR_1_ADDRESS_EXPR, 100, 1);
     state.cancel_project(1);
 
     state.claim(INVESTOR_1_ADDRESS_EXPR, 1, 1);

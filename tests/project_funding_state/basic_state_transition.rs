@@ -26,7 +26,7 @@ fn funding_state_cool_off() {
     state.deploy_contract();
     state.create_valid_mockup_project();
     state.set_block_timestamp("101");
-    state.invest(INVESTOR_1_ADDRESS_EXPR, 90001);
+    state.invest(INVESTOR_1_ADDRESS_EXPR, 90001, 1);
 
     state.check_funding_state(1, ProjectFundingState::CFWaitingCooloff);
 }
@@ -37,7 +37,7 @@ fn funding_state_successful() {
     state.deploy_contract();
     state.create_valid_mockup_project();
     state.set_block_timestamp("101");
-    state.invest(INVESTOR_1_ADDRESS_EXPR, 90001);
+    state.invest(INVESTOR_1_ADDRESS_EXPR, 90001, 1);
     state.set_block_timestamp("10001");
 
     state.check_funding_state(1, ProjectFundingState::CFSuccessful);
@@ -69,7 +69,7 @@ fn funding_state_loan_active() {
     state.deploy_contract();
     state.create_valid_mockup_project();
     state.set_block_timestamp("101");
-    state.invest(INVESTOR_1_ADDRESS_EXPR, 90001);
+    state.invest(INVESTOR_1_ADDRESS_EXPR, 90001, 1);
     state.set_block_timestamp("10001");
 
     state.claim_loan_funds(1);
@@ -82,7 +82,7 @@ fn funding_state_completed() {
     state.deploy_contract();
     state.create_valid_mockup_project();
     state.set_block_timestamp("101");
-    state.invest(INVESTOR_1_ADDRESS_EXPR, 90001);
+    state.invest(INVESTOR_1_ADDRESS_EXPR, 90001, 1);
     state.set_block_timestamp("10001");
     state.claim_loan_funds(1);
 
