@@ -1,7 +1,7 @@
 multiversx_sc::imports!();
 
 #[multiversx_sc::module]
-pub trait AdminModule {
+pub trait PermissionsModule {
     fn is_address_admin(&self, address: &ManagedAddress) -> bool {
         self.admin_list().contains(address)
     }
