@@ -16,6 +16,7 @@ pub trait AdminModule: crate::permissions::PermissionsModule {
         cf_end_timestamp: u64,
         cf_target_min: BigUint,
         cf_target_max: BigUint,
+        loan_duration: u64,
     ) {
     }
 

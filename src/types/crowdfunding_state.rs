@@ -24,6 +24,8 @@ pub struct CrowdfundingStateContext<M: ManagedTypeApi> {
     pub cf_progress: BigUint<M>,
 
     pub cf_state: ProjectFundingState,
+    pub loan_duration: u64,
+    pub loan_start_timestamp: u64,
     // add loan start time
     // add expected loan end time
 }
