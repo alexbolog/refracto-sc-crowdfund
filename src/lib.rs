@@ -30,6 +30,7 @@ multiversx_sc::imports!();
 
 mod admin;
 mod beneficiary;
+mod common;
 mod kyc;
 mod permissions;
 mod storage;
@@ -42,6 +43,7 @@ pub trait LoanCrowdfundScContract:
     + kyc::KycModule
     + admin::AdminModule
     + beneficiary::BeneficiaryModule
+    + common::CommonModule
 {
     #[init]
     fn init(&self) {}
