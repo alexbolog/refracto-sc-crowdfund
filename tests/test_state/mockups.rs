@@ -21,8 +21,12 @@ use super::{
 
 impl LoanCfTestState {
     pub fn create_valid_mockup_project(&mut self) {
+        self.create_valid_mockup_project_explicit_project_id(1);
+    }
+
+    pub fn create_valid_mockup_project_explicit_project_id(&mut self, project_id: u64) {
         self.create_project(
-            1,
+            project_id,
             "TEST PROJ",
             USDC_TOKEN_ID,
             100,

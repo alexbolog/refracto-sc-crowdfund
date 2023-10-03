@@ -1,9 +1,9 @@
 use loan_crowdfund_sc::{admin::ProxyTrait as _, beneficiary::ProxyTrait as _, ProxyTrait};
-use multiversx_sc::types::Address;
+use multiversx_sc::{types::Address, err_msg};
 use multiversx_sc_scenario::{
     api::StaticApi,
     managed_buffer, managed_token_id,
-    scenario_model::{Account, AddressValue, ScCallStep, ScDeployStep, SetStateStep},
+    scenario_model::{Account, AddressValue, ScCallStep, ScDeployStep, SetStateStep, TxExpect},
     ContractInfo, ScenarioWorld,
 };
 
@@ -63,12 +63,12 @@ impl LoanCfTestState {
         self
     }
 
-    pub fn invest(&mut self, investor_address_expr: &str, amount: u64) {
+    pub fn invest(&mut self, investor_address_expr: &str, amount: u64, project_id: u64) {
         self.world.sc_call(
             ScCallStep::new()
                 .from(investor_address_expr)
                 .esdt_transfer(USDC_TOKEN_ID, 0, amount)
-                .call(self.contract.invest()),
+                .call(self.contract.invest(project_id)),
         );
     }
 
@@ -78,6 +78,22 @@ impl LoanCfTestState {
                 .from(investor_address_expr)
                 .esdt_transfer(LOAN_SHARES_ID, nonce, amount)
                 .call(self.contract.withdraw()),
+        );
+    }
+
+    pub fn withdraw_and_expect_err(
+        &mut self,
+        investor_address_expr: &str,
+        nonce: u64,
+        amount: u64,
+        err_msg: &str
+    ) {
+        self.world.sc_call(
+            ScCallStep::new()
+                .from(investor_address_expr)
+                .esdt_transfer(LOAN_SHARES_ID, nonce, amount)
+                .call(self.contract.withdraw())
+                .expect(TxExpect::err(4, "str:".to_string() + err_msg))
         );
     }
 
