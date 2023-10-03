@@ -55,6 +55,15 @@ pub trait LoanCrowdfundScContract:
         self.require_address_is_kyc_compliant(&caller);
     }
 
+    #[endpoint(withdraw)]
+    fn withdraw(&self) {}
+
+    #[endpoint(claim)]
+    fn claim(&self) {}
+
+    #[endpoint(distributeRepayment)]
+    fn distribute_repayment(&self) {}
+
     fn mint_loan_shares(&self) -> EsdtTokenPayment {
         todo!()
     }
