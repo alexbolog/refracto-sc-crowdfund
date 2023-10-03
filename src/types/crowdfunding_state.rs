@@ -22,6 +22,8 @@ pub struct CrowdfundingStateContext<M: ManagedTypeApi> {
     pub cf_target_min: BigUint<M>,
     pub cf_target_max: BigUint<M>,
     pub cf_progress: BigUint<M>,
+
+    pub cf_state: ProjectFundingState,
     // add loan start time
     // add expected loan end time
 }
@@ -30,7 +32,7 @@ pub struct CrowdfundingStateContext<M: ManagedTypeApi> {
 
 // user -> trimite bani la escrow -> escrow cumpara shares ca proxy
 // bot -> call escrow to release shares to user
-
+#[derive(TopEncode, TopDecode, TypeAbi, NestedDecode, NestedEncode)]
 pub enum ProjectFundingState {
     Invalid = 0,
     Pending = 1,
