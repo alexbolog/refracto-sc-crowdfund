@@ -5,7 +5,7 @@ use loan_crowdfund_sc::types::crowdfunding_state::ProjectFundingState;
 fn funding_state_cool_off_to_failed() {
     let mut state = LoanCfTestState::new();
     state.deploy_contract();
-    state.create_valid_mockup_project();
+    state.create_fully_mocked_project();
     state.set_block_timestamp("101");
     state.invest(INVESTOR_1_ADDRESS_EXPR, 90001, 1);
     state.set_block_timestamp("102");

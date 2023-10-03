@@ -5,7 +5,7 @@ use loan_crowdfund_sc::{
 use multiversx_sc::{storage::mappers::SingleValue, types::Address};
 use multiversx_sc_scenario::{
     api::StaticApi,
-    managed_buffer, managed_token_id,
+    managed_biguint, managed_buffer, managed_token_id,
     scenario_model::{
         Account, AddressValue, CheckAccount, CheckStateStep, ScCallStep, ScDeployStep, ScQueryStep,
         SetStateStep,
@@ -52,5 +52,29 @@ impl LoanCfTestState {
                     Some(""),
                 ),
             ));
+    }
+
+    pub fn check_expected_interest(&mut self, project_id: u64, expected_interest: u64) {
+        self.world.sc_query(
+            ScQueryStep::new()
+                .call(self.contract.get_expected_interest(project_id))
+                .expect_value(managed_biguint!(expected_interest)),
+        );
+    }
+
+    pub fn check_expected_late_fees(&mut self, project_id: u64, expected_late_fees: u64) {
+        self.world.sc_query(
+            ScQueryStep::new()
+                .call(self.contract.get_expected_late_fees(project_id))
+                .expect_value(managed_biguint!(expected_late_fees)),
+        );
+    }
+
+    pub fn check_total_repayment_amount(&mut self, project_id: u64, expected_total_amount: u64) {
+        self.world.sc_query(
+            ScQueryStep::new()
+                .call(self.contract.get_total_amount(project_id))
+                .expect_value(managed_biguint!(expected_total_amount)),
+        );
     }
 }
