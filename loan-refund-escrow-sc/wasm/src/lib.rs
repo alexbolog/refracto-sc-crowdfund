@@ -5,21 +5,25 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                            0
+// Endpoints:                            2
 // Async Callback (empty):               1
-// Total number of exported functions:   2
+// Total number of exported functions:   4
 
 #![no_std]
-#![allow(internal_features)]
+
+// Configuration that works with rustc < 1.73.0.
+// TODO: Recommended rustc version: 1.73.0 or newer.
 #![feature(lang_items)]
 
 multiversx_sc_wasm_adapter::allocator!();
 multiversx_sc_wasm_adapter::panic_handler!();
 
 multiversx_sc_wasm_adapter::endpoints! {
-    empty
+    loan_refund_escrow_sc
     (
         init => init
+        getProjectId => project_id
+        getDeveloperWalletAddress => developer_wallet_address
     )
 }
 
