@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                           19
+// Endpoints:                           20
 // Async Callback (empty):               1
-// Total number of exported functions:  21
+// Total number of exported functions:  22
 
 #![no_std]
 
@@ -30,6 +30,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         getWithdrawFromLoanTimeSpan => withdraw_from_loan_timespan
         getLoanShareTokenIdentifiers => loan_share_token_identifiers
         getCrowdfundingState => crowdfunding_state
+        getSourceLoanRepaymentScAddress => source_loan_repayment_sc_address
         getIsKycCompliant => get_is_kyc_compliant
         registerSuccessfulKyc => register_successful_kyc
         getWhitelistedUsers => whitelisted_users
@@ -39,7 +40,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         claimLoanFunds => claim_loan_funds
         getExpectedInterest => get_expected_interest
         getExpectedLateFees => get_expected_late_fees
-        getFinalAmount => get_final_amount
+        getTotalAmount => get_total_amount
         getFundingState => get_funding_state
     )
 }
