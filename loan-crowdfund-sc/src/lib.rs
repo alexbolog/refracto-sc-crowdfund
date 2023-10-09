@@ -74,6 +74,7 @@ pub trait LoanCrowdfundScContract:
 
         self.update_successful_investment(
             &mut cf_state,
+            caller,
             payment.amount,
             self.blockchain().get_block_timestamp(),
         );
@@ -103,12 +104,13 @@ pub trait LoanCrowdfundScContract:
     fn update_successful_investment(
         &self,
         state: &mut CrowdfundingStateContext<Self::Api>,
+        caller: ManagedAddress,
         amount: BigUint,
         timestamp: u64,
     ) {
         state.cf_progress += &amount;
         self.recorded_payments(state.project_id)
-            .insert((timestamp, amount));
+            .insert((caller, timestamp, amount));
 
         self.crowdfunding_state(state.project_id).set(state);
     }
