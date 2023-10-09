@@ -1,6 +1,6 @@
 use loan_crowdfund_sc::{
     admin::ProxyTrait as _, beneficiary::ProxyTrait as _, common::ProxyTrait,
-    types::crowdfunding_state::ProjectFundingState, ProxyTrait as _,
+    constants::COOL_OFF_PERIOD, types::crowdfunding_state::ProjectFundingState, ProxyTrait as _,
 };
 use multiversx_sc::{storage::mappers::SingleValue, types::Address};
 use multiversx_sc_scenario::{
@@ -20,8 +20,9 @@ use super::{
 };
 
 impl LoanCfTestState {
-    pub fn set_block_timestamp(&mut self, block_timestamp_expr: &str) {
-        self.world
-            .set_state_step(SetStateStep::new().block_timestamp(block_timestamp_expr));
+    pub fn set_block_timestamp(&mut self, block_timestamp_expr: u64) {
+        self.world.set_state_step(
+            SetStateStep::new().block_timestamp(COOL_OFF_PERIOD + block_timestamp_expr),
+        );
     }
 }

@@ -34,10 +34,10 @@ fn interest_applied_correctly() {
         12 * 30 * 24 * 3600,
     );
 
-    state.set_block_timestamp("101");
+    state.set_block_timestamp(101);
     state.invest("investor_1", total_principal, project_id);
 
-    state.set_block_timestamp(&target_timestamp.to_string());
+    state.set_block_timestamp(target_timestamp);
 
     state.check_expected_interest(project_id, expected_interest);
     state.check_total_repayment_amount(project_id, expected_total);
@@ -66,9 +66,9 @@ fn late_fees_applied_correctly() {
         late_fees_per_day_rate,
         loan_duration,
     );
-    state.set_block_timestamp("101");
+    state.set_block_timestamp(101);
     state.invest(INVESTOR_1_ADDRESS_EXPR, principal, project_id);
-    state.set_block_timestamp(&(101 + loan_duration + expected_late_fees).to_string());
+    state.set_block_timestamp(101 + loan_duration + expected_late_fees);
 
     state.check_expected_late_fees(project_id, expected_late_fees);
     state.check_total_repayment_amount(project_id, expected_total_amount);
@@ -101,9 +101,9 @@ fn interest_and_late_fees_applied_correctly() {
         late_fees_per_day_rate,
         loan_duration,
     );
-    state.set_block_timestamp("101");
+    state.set_block_timestamp(101);
     state.invest(INVESTOR_1_ADDRESS_EXPR, principal, project_id);
-    state.set_block_timestamp(&(101 + loan_duration + expected_late_fees).to_string());
+    state.set_block_timestamp(101 + loan_duration + expected_late_fees);
 
     state.check_expected_interest(project_id, expected_interest);
     state.check_expected_late_fees(project_id, expected_late_fees);

@@ -1,5 +1,6 @@
 use loan_crowdfund_sc::{
-    admin::ProxyTrait as _, beneficiary::ProxyTrait as _, kyc::ProxyTrait as _, ProxyTrait,
+    admin::ProxyTrait as _, beneficiary::ProxyTrait as _, constants::COOL_OFF_PERIOD,
+    kyc::ProxyTrait as _, ProxyTrait,
 };
 use multiversx_sc::{err_msg, types::Address};
 use multiversx_sc_scenario::{
@@ -39,7 +40,8 @@ impl LoanCfTestState {
                         .nonce(1)
                         .balance(ACCOUNT_BALANCE_EXPR)
                         .esdt_balance(USDC_TOKEN_ID, ACCOUNT_BALANCE_EXPR),
-                ),
+                )
+                .block_timestamp(COOL_OFF_PERIOD),
         );
 
         let owner_address = AddressValue::from(OWNER_ADDRESS_EXPR).to_address();
