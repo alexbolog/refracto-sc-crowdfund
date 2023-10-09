@@ -31,7 +31,7 @@ pub mod admin;
 pub mod beneficiary;
 pub mod common;
 pub mod constants;
-mod kyc;
+pub mod kyc;
 mod permissions;
 mod storage;
 pub mod types;
