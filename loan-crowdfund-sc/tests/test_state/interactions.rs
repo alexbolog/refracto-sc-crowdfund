@@ -12,8 +12,8 @@ use multiversx_sc_scenario::{
 
 use super::{
     world, LoanCfContract, LoanCfTestState, ACCOUNT_BALANCE_EXPR, BENEFICIARY_ADDRESS_EXPR,
-    INVESTOR_1_ADDRESS_EXPR, INVESTOR_2_ADDRESS_EXPR, LOAN_CF_ADDRESS_EXPR, LOAN_SHARES_ID,
-    OWNER_ADDRESS_EXPR, USDC_TOKEN_ID,
+    INVALID_TOKEN_ID_EXPR, INVESTOR_1_ADDRESS_EXPR, INVESTOR_2_ADDRESS_EXPR, LOAN_CF_ADDRESS_EXPR,
+    LOAN_SHARES_ID, OWNER_ADDRESS_EXPR, USDC_TOKEN_ID,
 };
 
 impl LoanCfTestState {
@@ -32,14 +32,16 @@ impl LoanCfTestState {
                     Account::new()
                         .nonce(1)
                         .balance(ACCOUNT_BALANCE_EXPR)
-                        .esdt_balance(USDC_TOKEN_ID, ACCOUNT_BALANCE_EXPR),
+                        .esdt_balance(USDC_TOKEN_ID, ACCOUNT_BALANCE_EXPR)
+                        .esdt_balance(INVALID_TOKEN_ID_EXPR, ACCOUNT_BALANCE_EXPR),
                 )
                 .put_account(
                     INVESTOR_2_ADDRESS_EXPR,
                     Account::new()
                         .nonce(1)
                         .balance(ACCOUNT_BALANCE_EXPR)
-                        .esdt_balance(USDC_TOKEN_ID, ACCOUNT_BALANCE_EXPR),
+                        .esdt_balance(USDC_TOKEN_ID, ACCOUNT_BALANCE_EXPR)
+                        .esdt_balance(INVALID_TOKEN_ID_EXPR, ACCOUNT_BALANCE_EXPR),
                 )
                 .block_timestamp(COOL_OFF_PERIOD),
         );
@@ -93,6 +95,23 @@ impl LoanCfTestState {
             ScCallStep::new()
                 .from(investor_address_expr)
                 .esdt_transfer(USDC_TOKEN_ID, 0, amount)
+                .call(self.contract.invest(project_id))
+                .expect(TxExpect::err(4, "str:".to_string() + err_msg)),
+        );
+    }
+
+    pub fn explicit_invest_and_expect_err(
+        &mut self,
+        investor_address_expr: &str,
+        token_id: &str,
+        amount: u64,
+        project_id: u64,
+        err_msg: &str,
+    ) {
+        self.world.sc_call(
+            ScCallStep::new()
+                .from(investor_address_expr)
+                .esdt_transfer(token_id, 0, amount)
                 .call(self.contract.invest(project_id))
                 .expect(TxExpect::err(4, "str:".to_string() + err_msg)),
         );
