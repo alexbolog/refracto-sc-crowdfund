@@ -118,7 +118,7 @@ impl<M: ManagedTypeApi> CrowdfundingStateContext<M> {
 
 // user -> trimite bani la escrow -> escrow cumpara shares ca proxy
 // bot -> call escrow to release shares to user
-#[derive(TopEncode, TopDecode, TypeAbi, NestedDecode, NestedEncode)]
+#[derive(TopEncode, TopDecode, TypeAbi, NestedDecode, NestedEncode, PartialEq, Eq)]
 pub enum ProjectFundingState {
     Invalid = 0,
     Pending = 1,
