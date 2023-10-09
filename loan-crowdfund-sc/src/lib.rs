@@ -29,7 +29,8 @@
 use types::crowdfunding_state::CrowdfundingStateContext;
 
 use crate::{
-    constants::ERR_CANNOT_INVEST_IN_CRT_STATE, types::crowdfunding_state::ProjectFundingState,
+    constants::{ERR_CANNOT_INVEST_IN_CRT_STATE, ERR_INVALID_PROJECT_ID},
+    types::crowdfunding_state::ProjectFundingState,
 };
 
 multiversx_sc::imports!();
@@ -92,5 +93,26 @@ pub trait LoanCrowdfundScContract:
             &state == &ProjectFundingState::CFActive,
             ERR_CANNOT_INVEST_IN_CRT_STATE
         );
+    }
+
+    fn get_project_by_id_or_fail(&self, project_id: u64) -> CrowdfundingStateContext<Self::Api> {
+        let state_strg = self.crowdfunding_state(project_id);
+        require!(!state_strg.is_empty(), ERR_INVALID_PROJECT_ID);
+
+        state_strg.get()
+    }
+
+    fn get_payment_or_fail_if_invalid(
+        &self,
+        cf_state: CrowdfundingStateContext<Self::Api>,
+    ) -> EsdtTokenPayment {
+        let payment = self.call_value().single_esdt();
+
+        require!(
+            &payment.token_identifier == &cf_state.project_payment_token,
+            ERR_INVALID_PROJECT_ID
+        );
+
+        payment
     }
 }
