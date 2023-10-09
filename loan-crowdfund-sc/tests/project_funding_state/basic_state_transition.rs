@@ -25,6 +25,8 @@ fn funding_state_cool_off() {
     let mut state = LoanCfTestState::new();
     state.deploy_contract();
     state.create_fully_mocked_project();
+    state.whitelist_address(INVESTOR_1_ADDRESS_EXPR);
+
     state.set_block_timestamp("101");
     state.invest(INVESTOR_1_ADDRESS_EXPR, 90001, 1);
 
@@ -36,6 +38,8 @@ fn funding_state_successful() {
     let mut state = LoanCfTestState::new();
     state.deploy_contract();
     state.create_fully_mocked_project();
+    state.whitelist_address(INVESTOR_1_ADDRESS_EXPR);
+
     state.set_block_timestamp("101");
     state.invest(INVESTOR_1_ADDRESS_EXPR, 90001, 1);
     state.set_block_timestamp("10001");
@@ -68,6 +72,8 @@ fn funding_state_loan_active() {
     let mut state = LoanCfTestState::new();
     state.deploy_contract();
     state.create_fully_mocked_project();
+    state.whitelist_address(INVESTOR_1_ADDRESS_EXPR);
+
     state.set_block_timestamp("101");
     state.invest(INVESTOR_1_ADDRESS_EXPR, 90001, 1);
     state.set_block_timestamp("10001");
@@ -81,6 +87,8 @@ fn funding_state_completed() {
     let mut state = LoanCfTestState::new();
     state.deploy_contract();
     state.create_fully_mocked_project();
+    state.whitelist_address(INVESTOR_1_ADDRESS_EXPR);
+
     state.set_block_timestamp("101");
     state.invest(INVESTOR_1_ADDRESS_EXPR, 90001, 1);
     state.set_block_timestamp("10001");
