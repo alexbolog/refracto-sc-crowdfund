@@ -34,8 +34,8 @@ pub trait AdminModule:
         // let escrow_sc_address = self.deploy_escrow_sc();
 
         // TODO: uncomment after fixing test minting
-        // let share_token_nonce =
-        //     self.mint_project_shares(&cf_target_max, &share_price_per_unit, &project_name);
+        let share_token_nonce =
+            self.mint_project_shares(&cf_target_max, &share_price_per_unit, &project_name);
 
         let context = CrowdfundingStateContext::new(
             project_id,
@@ -44,8 +44,8 @@ pub trait AdminModule:
             daily_interest_rate,
             daily_penalty_fee_rate,
             developer_wallet,
-            // share_token_nonce,
-            1,
+            share_token_nonce,
+            // 1,
             share_price_per_unit,
             cf_start_timestamp,
             cf_end_timestamp,
@@ -72,6 +72,12 @@ pub trait AdminModule:
     #[endpoint(adminDistributeRepayment)]
     fn admin_distribute_repayments(&self, project_id: u64) {
         self.require_caller_is_admin();
+    }
+
+    #[only_owner]
+    #[endpoint(setTokenIdentifier)]
+    fn set_token_identifier(&self, token: TokenIdentifier) {
+        self.loan_share_token_identifier().set(token);
     }
 
     #[payable("*")]
