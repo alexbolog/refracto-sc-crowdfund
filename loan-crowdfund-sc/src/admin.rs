@@ -58,6 +58,10 @@ pub trait AdminModule:
     #[endpoint(cancel)]
     fn cancel_project(&self, project_id: u64) {
         self.require_caller_is_admin();
+
+        let mut context = self.crowdfunding_state(project_id).get();
+        context.is_cancelled = true;
+        self.crowdfunding_state(project_id).set(context);
     }
 
     #[endpoint(adminDistributeRepayment)]
