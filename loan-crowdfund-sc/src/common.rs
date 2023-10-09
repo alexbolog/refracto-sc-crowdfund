@@ -39,7 +39,7 @@ pub trait CommonModule:
         let last_timestamp_for_cool_off = block_timestamp - COOL_OFF_PERIOD;
 
         let mut aggregated_cool_off_amount = BigUint::zero();
-        for (timestamp, amount) in self.recorded_payments(project_id).iter() {
+        for (_, timestamp, amount) in self.recorded_payments(project_id).iter() {
             if timestamp >= last_timestamp_for_cool_off {
                 aggregated_cool_off_amount += amount;
             }

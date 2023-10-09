@@ -4,5 +4,5 @@ multiversx_sc::imports!();
 pub trait PaymentsModule {
     #[view(getRecordedPayments)]
     #[storage_mapper("recorded_payments")]
-    fn recorded_payments(&self, project_id: u64) -> SetMapper<(u64, BigUint)>;
+    fn recorded_payments(&self, project_id: u64) -> SetMapper<(ManagedAddress, u64, BigUint)>;
 }
