@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                           21
+// Endpoints:                           23
 // Async Callback:                       1
-// Total number of exported functions:  23
+// Total number of exported functions:  25
 
 #![no_std]
 
@@ -26,6 +26,8 @@ multiversx_sc_wasm_adapter::endpoints! {
         withdraw => withdraw
         claim => claim
         distributeRepayment => distribute_repayment
+        addAdmins => add_admins
+        removeAdmins => remove_admins
         getAdminList => admin_list
         getWithdrawFromLoanTimeSpan => withdraw_from_loan_timespan
         getLoanShareTokenIdentifier => loan_share_token_identifier
