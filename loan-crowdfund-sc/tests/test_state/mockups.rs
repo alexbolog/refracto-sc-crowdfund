@@ -1,6 +1,6 @@
 use loan_crowdfund_sc::{
     admin::ProxyTrait as _, beneficiary::ProxyTrait as _, common::ProxyTrait,
-    types::crowdfunding_state::ProjectFundingState, ProxyTrait as _,
+    constants::COOL_OFF_PERIOD, types::crowdfunding_state::ProjectFundingState, ProxyTrait as _,
 };
 use multiversx_sc::{storage::mappers::SingleValue, types::Address};
 use multiversx_sc_scenario::{
@@ -52,8 +52,8 @@ impl LoanCfTestState {
             daily_penalty_fee,
             self.beneficiary_address.clone(),
             1,
-            100,
-            10000,
+            100 + COOL_OFF_PERIOD,
+            10000 + COOL_OFF_PERIOD,
             principal_min,
             principal_max,
             loan_duration,
