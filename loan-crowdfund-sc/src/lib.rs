@@ -29,7 +29,9 @@
 use types::crowdfunding_state::CrowdfundingStateContext;
 
 use crate::{
-    constants::{ERR_CANNOT_INVEST_IN_CRT_STATE, ERR_INVALID_PROJECT_ID},
+    constants::{
+        ERR_CANNOT_INVEST_IN_CRT_STATE, ERR_INVALID_PAYMENT_TOKEN, ERR_INVALID_PROJECT_ID,
+    },
     types::crowdfunding_state::ProjectFundingState,
 };
 
@@ -99,7 +101,7 @@ pub trait LoanCrowdfundScContract:
 
         require!(
             &payment.token_identifier == &cf_state.project_payment_token,
-            ERR_INVALID_PROJECT_ID
+            ERR_INVALID_PAYMENT_TOKEN
         );
 
         payment
