@@ -25,9 +25,9 @@ fn failed_invest_during_funding_state_successful() {
     let mut state = LoanCfTestState::new();
     state.deploy_contract();
     state.create_fully_mocked_project();
-    state.set_block_timestamp("101");
+    state.set_block_timestamp(101);
     state.invest(INVESTOR_1_ADDRESS_EXPR, 90001, 1);
-    state.set_block_timestamp("10001");
+    state.set_block_timestamp(10001);
 
     state.check_funding_state(1, ProjectFundingState::CFSuccessful);
 
@@ -44,7 +44,7 @@ fn failed_invest_during_funding_state_failed() {
     let mut state = LoanCfTestState::new();
     state.deploy_contract();
     state.create_fully_mocked_project();
-    state.set_block_timestamp("10001");
+    state.set_block_timestamp(10001);
 
     state.check_funding_state(1, ProjectFundingState::CFFailed);
 
@@ -76,9 +76,9 @@ fn failed_invest_during_funding_state_loan_active() {
     let mut state = LoanCfTestState::new();
     state.deploy_contract();
     state.create_fully_mocked_project();
-    state.set_block_timestamp("101");
+    state.set_block_timestamp(101);
     state.invest(INVESTOR_1_ADDRESS_EXPR, 90001, 1);
-    state.set_block_timestamp("10001");
+    state.set_block_timestamp(10001);
     state.claim(INVESTOR_1_ADDRESS_EXPR, 1, 1);
 
     state.check_funding_state(1, ProjectFundingState::LoanActive);
@@ -96,9 +96,9 @@ fn failed_invest_during_funding_state_completed() {
     let mut state = LoanCfTestState::new();
     state.deploy_contract();
     state.create_fully_mocked_project();
-    state.set_block_timestamp("101");
+    state.set_block_timestamp(101);
     state.invest(INVESTOR_1_ADDRESS_EXPR, 90001, 1);
-    state.set_block_timestamp("10001");
+    state.set_block_timestamp(10001);
     state.claim_loan_funds(1);
 
     state.repay_loan(1, 11000);
@@ -119,7 +119,7 @@ fn failed_over_financing() {
     let mut state = LoanCfTestState::new();
     state.deploy_contract();
     state.create_fully_mocked_project();
-    state.set_block_timestamp("101");
+    state.set_block_timestamp(101);
     state.invest(INVESTOR_1_ADDRESS_EXPR, 99999, 1);
 
     state.invest_and_expect_err(INVESTOR_1_ADDRESS_EXPR, 100, 1, ERR_CANNOT_OVER_FINANCE)
