@@ -26,6 +26,12 @@
 
 #![no_std]
 
+use types::crowdfunding_state::CrowdfundingStateContext;
+
+use crate::{
+    constants::ERR_CANNOT_INVEST_IN_CRT_STATE, types::crowdfunding_state::ProjectFundingState,
+};
+
 multiversx_sc::imports!();
 pub mod admin;
 pub mod beneficiary;
@@ -76,4 +82,15 @@ pub trait LoanCrowdfundScContract:
     }
 
     fn update_cf_progress(&self) {}
+
+    fn require_state_is_active(&self, cf_state: CrowdfundingStateContext<Self::Api>) {
+        let state = cf_state.get_funding_state(
+            &self.get_aggregated_cool_off_amount(cf_state.project_id),
+            self.blockchain().get_block_timestamp(),
+        );
+        require!(
+            &state == &ProjectFundingState::CFActive,
+            ERR_CANNOT_INVEST_IN_CRT_STATE
+        );
+    }
 }
