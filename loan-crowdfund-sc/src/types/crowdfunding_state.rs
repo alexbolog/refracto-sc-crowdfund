@@ -27,8 +27,7 @@ pub struct CrowdfundingStateContext<M: ManagedTypeApi> {
     pub loan_start_timestamp: u64,
     pub repayment_contract_address: ManagedAddress<M>,
 
-    pub is_cancelled: bool, // add loan start time
-                            // add expected loan end time
+    pub is_cancelled: bool,
 }
 
 impl<M: ManagedTypeApi> CrowdfundingStateContext<M> {
