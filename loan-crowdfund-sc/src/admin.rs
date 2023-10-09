@@ -32,6 +32,10 @@ pub trait AdminModule:
     #[only_owner]
     #[endpoint(issueAndSetRoles)]
     fn issue_and_set_roles(&self, token_name: ManagedBuffer, token_ticker: ManagedBuffer) {
+        require!(
+            self.loan_share_token_identifier().is_empty(),
+            "TOKEN ALREADY ISSUED"
+        );
         let issue_cost = self.call_value().egld_value().clone_value();
         self.send()
             .esdt_system_sc_proxy()
