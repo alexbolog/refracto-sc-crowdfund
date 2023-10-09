@@ -6,6 +6,7 @@ fn funding_state_cool_off_to_failed() {
     let mut state = LoanCfTestState::new();
     state.deploy_contract();
     state.create_fully_mocked_project();
+    state.whitelist_address(INVESTOR_1_ADDRESS_EXPR);
     state.set_block_timestamp("101");
     state.invest(INVESTOR_1_ADDRESS_EXPR, 90001, 1);
     state.set_block_timestamp("102");
