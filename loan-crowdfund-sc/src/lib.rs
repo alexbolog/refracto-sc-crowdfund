@@ -62,11 +62,13 @@ pub trait LoanCrowdfundScContract:
         let caller = self.blockchain().get_caller();
         self.require_address_is_kyc_compliant(&caller);
 
-        let payment = self.call_value().single_esdt();
-        let mut ctx = self.crowdfunding_state(project_id).get();
-        ctx.cf_progress += payment.amount;
+        let mut cf_state = self.get_project_by_id_or_fail(project_id);
+        self.require_state_is_active(&cf_state);
+        let payment = self.get_payment_or_fail_if_invalid(&cf_state);
 
-        self.crowdfunding_state(project_id).set(ctx);
+        cf_state.cf_progress += payment.amount;
+
+        self.crowdfunding_state(project_id).set(cf_state);
     }
 
     #[endpoint(withdraw)]
@@ -82,19 +84,6 @@ pub trait LoanCrowdfundScContract:
         todo!()
     }
 
-    fn update_cf_progress(&self) {}
-
-    fn require_state_is_active(&self, cf_state: CrowdfundingStateContext<Self::Api>) {
-        let state = cf_state.get_funding_state(
-            &self.get_aggregated_cool_off_amount(cf_state.project_id),
-            self.blockchain().get_block_timestamp(),
-        );
-        require!(
-            &state == &ProjectFundingState::CFActive,
-            ERR_CANNOT_INVEST_IN_CRT_STATE
-        );
-    }
-
     fn get_project_by_id_or_fail(&self, project_id: u64) -> CrowdfundingStateContext<Self::Api> {
         let state_strg = self.crowdfunding_state(project_id);
         require!(!state_strg.is_empty(), ERR_INVALID_PROJECT_ID);
@@ -104,7 +93,7 @@ pub trait LoanCrowdfundScContract:
 
     fn get_payment_or_fail_if_invalid(
         &self,
-        cf_state: CrowdfundingStateContext<Self::Api>,
+        cf_state: &CrowdfundingStateContext<Self::Api>,
     ) -> EsdtTokenPayment {
         let payment = self.call_value().single_esdt();
 
@@ -114,5 +103,16 @@ pub trait LoanCrowdfundScContract:
         );
 
         payment
+    }
+
+    fn require_state_is_active(&self, cf_state: &CrowdfundingStateContext<Self::Api>) {
+        let state = cf_state.get_funding_state(
+            &self.get_aggregated_cool_off_amount(cf_state.project_id),
+            self.blockchain().get_block_timestamp(),
+        );
+        require!(
+            &state == &ProjectFundingState::CFActive,
+            ERR_CANNOT_INVEST_IN_CRT_STATE
+        );
     }
 }
