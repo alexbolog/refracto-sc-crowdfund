@@ -68,9 +68,15 @@ pub trait LoanCrowdfundScContract:
         self.require_state_is_active(&cf_state);
         let payment = self.get_payment_or_fail_if_invalid(&cf_state);
 
-        cf_state.cf_progress += payment.amount;
+        let shares = self.get_loan_shares(&cf_state, &payment.amount);
+        self.send()
+            .direct_multi(&caller, &ManagedVec::from_single_item(shares));
 
-        self.crowdfunding_state(project_id).set(cf_state);
+        self.update_successful_investment(
+            &mut cf_state,
+            payment.amount,
+            self.blockchain().get_block_timestamp(),
+        );
     }
 
     #[endpoint(withdraw)]
@@ -82,8 +88,29 @@ pub trait LoanCrowdfundScContract:
     #[endpoint(distributeRepayment)]
     fn distribute_repayment(&self) {}
 
-    fn mint_loan_shares(&self) -> EsdtTokenPayment {
-        todo!()
+    fn get_loan_shares(
+        &self,
+        state: &CrowdfundingStateContext<Self::Api>,
+        invested_amount: &BigUint,
+    ) -> EsdtTokenPayment {
+        let share_token_id = self.loan_share_token_identifier().get();
+        let nonce = state.share_token_nonce;
+        let shares_amount = invested_amount / &state.share_price_per_unit;
+
+        EsdtTokenPayment::new(share_token_id, nonce, shares_amount)
+    }
+
+    fn update_successful_investment(
+        &self,
+        state: &mut CrowdfundingStateContext<Self::Api>,
+        amount: BigUint,
+        timestamp: u64,
+    ) {
+        state.cf_progress += &amount;
+        self.recorded_payments(state.project_id)
+            .insert((timestamp, amount));
+
+        self.crowdfunding_state(state.project_id).set(state);
     }
 
     fn get_project_by_id_or_fail(&self, project_id: u64) -> CrowdfundingStateContext<Self::Api> {
