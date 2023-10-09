@@ -14,7 +14,7 @@ pub const INVESTOR_1_ADDRESS_EXPR: &str = "address:investor1";
 pub const INVESTOR_2_ADDRESS_EXPR: &str = "address:investor2";
 pub const ACCOUNT_BALANCE_EXPR: &str = "100,000,000";
 
-pub const USDC_TOKEN_ID: &str = "USDC-123456";
+pub const USDC_TOKEN_ID: &str = "str:USDC-123456";
 pub const LOAN_SHARES_ID: &str = "REFRACTO-123456";
 
 pub mod checks;

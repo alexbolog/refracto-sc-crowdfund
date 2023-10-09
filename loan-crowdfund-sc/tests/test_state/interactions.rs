@@ -1,8 +1,10 @@
-use loan_crowdfund_sc::{admin::ProxyTrait as _, beneficiary::ProxyTrait as _, ProxyTrait};
+use loan_crowdfund_sc::{
+    admin::ProxyTrait as _, beneficiary::ProxyTrait as _, kyc::ProxyTrait as _, ProxyTrait,
+};
 use multiversx_sc::{err_msg, types::Address};
 use multiversx_sc_scenario::{
     api::StaticApi,
-    managed_buffer, managed_token_id,
+    managed_address, managed_buffer, managed_token_id,
     scenario_model::{Account, AddressValue, ScCallStep, ScDeployStep, SetStateStep, TxExpect},
     ContractInfo, ScenarioWorld,
 };
@@ -26,11 +28,17 @@ impl LoanCfTestState {
                 )
                 .put_account(
                     INVESTOR_1_ADDRESS_EXPR,
-                    Account::new().nonce(1).balance(ACCOUNT_BALANCE_EXPR),
+                    Account::new()
+                        .nonce(1)
+                        .balance(ACCOUNT_BALANCE_EXPR)
+                        .esdt_balance(USDC_TOKEN_ID, ACCOUNT_BALANCE_EXPR),
                 )
                 .put_account(
                     INVESTOR_2_ADDRESS_EXPR,
-                    Account::new().nonce(1).balance(ACCOUNT_BALANCE_EXPR),
+                    Account::new()
+                        .nonce(1)
+                        .balance(ACCOUNT_BALANCE_EXPR)
+                        .esdt_balance(USDC_TOKEN_ID, ACCOUNT_BALANCE_EXPR),
                 ),
         );
 
@@ -196,5 +204,14 @@ impl LoanCfTestState {
         //         .esdt_transfer(USDC_TOKEN_ID, 0, amount)
         //         .call(self.contract.repay_loan(project_id)),
         // );
+    }
+
+    pub fn whitelist_address(&mut self, address_expr: &str) {
+        self.world.sc_call(
+            ScCallStep::new().from(OWNER_ADDRESS_EXPR).call(
+                self.contract
+                    .register_successful_kyc(AddressValue::from(address_expr).to_address()),
+            ),
+        );
     }
 }
