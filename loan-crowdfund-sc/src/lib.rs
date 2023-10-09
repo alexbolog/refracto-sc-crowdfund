@@ -40,6 +40,7 @@ pub mod types;
 pub trait LoanCrowdfundScContract:
     permissions::PermissionsModule
     + storage::config::ConfigModule
+    + storage::payments::PaymentsModule
     + kyc::KycModule
     + admin::AdminModule
     + beneficiary::BeneficiaryModule

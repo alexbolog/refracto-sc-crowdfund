@@ -28,6 +28,8 @@ pub struct CrowdfundingStateContext<M: ManagedTypeApi> {
     pub repayment_contract_address: ManagedAddress<M>,
 
     pub is_cancelled: bool,
+    pub is_loan_active: bool,
+    pub is_repayed: bool,
 }
 
 impl<M: ManagedTypeApi> CrowdfundingStateContext<M> {
@@ -66,10 +68,48 @@ impl<M: ManagedTypeApi> CrowdfundingStateContext<M> {
             loan_start_timestamp,
             repayment_contract_address,
             is_cancelled: false,
+            is_loan_active: false,
+            is_repayed: false,
         }
     }
 
-    pub fn get_funding_state(&self) -> ProjectFundingState {
+    pub fn get_funding_state(
+        &self,
+        amount_cooling_off: &BigUint<M>,
+        block_timestamp: u64,
+    ) -> ProjectFundingState {
+        if self.is_cancelled {
+            return ProjectFundingState::CFCancelled;
+        }
+
+        if self.is_loan_active {
+            return ProjectFundingState::LoanActive;
+        }
+
+        if self.is_repayed {
+            return ProjectFundingState::Completed;
+        }
+
+        if block_timestamp < self.cf_start_timestamp {
+            return ProjectFundingState::Pending;
+        }
+
+        if block_timestamp < self.cf_end_timestamp && &self.cf_progress < &self.cf_target_max {
+            return ProjectFundingState::CFActive;
+        }
+
+        if block_timestamp < self.cf_end_timestamp
+            && &self.cf_progress - amount_cooling_off > self.cf_target_min
+        {
+            return ProjectFundingState::CFWaitingCooloff;
+        }
+
+        if block_timestamp > self.cf_end_timestamp && &self.cf_progress >= &self.cf_target_min {
+            return ProjectFundingState::CFSuccessful;
+        }
+        if block_timestamp > self.cf_end_timestamp && &self.cf_progress < &self.cf_target_min {
+            return ProjectFundingState::CFFailed;
+        }
         ProjectFundingState::Invalid
     }
 }
