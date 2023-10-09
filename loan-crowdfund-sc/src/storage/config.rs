@@ -4,10 +4,6 @@ use crate::types::crowdfunding_state::CrowdfundingStateContext;
 
 #[multiversx_sc::module]
 pub trait ConfigModule {
-    #[view(getWithdrawFromLoanTimeSpan)]
-    #[storage_mapper("withdraw_from_loan_timespan")]
-    fn withdraw_from_loan_timespan(&self) -> SingleValueMapper<u64>;
-
     #[view(getLoanShareTokenIdentifier)]
     #[storage_mapper("loan_share_token_identifier")]
     fn loan_share_token_identifier(&self) -> SingleValueMapper<TokenIdentifier>;
