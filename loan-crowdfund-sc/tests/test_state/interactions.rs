@@ -2,7 +2,10 @@ use loan_crowdfund_sc::{
     admin::ProxyTrait as _, beneficiary::ProxyTrait as _, constants::COOL_OFF_PERIOD,
     kyc::ProxyTrait as _, ProxyTrait,
 };
-use multiversx_sc::{err_msg, types::Address};
+use multiversx_sc::{
+    err_msg,
+    types::{Address, TokenIdentifier},
+};
 use multiversx_sc_scenario::{
     api::StaticApi,
     managed_address, managed_buffer, managed_token_id,
@@ -13,7 +16,7 @@ use multiversx_sc_scenario::{
 use super::{
     world, LoanCfContract, LoanCfTestState, ACCOUNT_BALANCE_EXPR, BENEFICIARY_ADDRESS_EXPR,
     INVALID_TOKEN_ID_EXPR, INVESTOR_1_ADDRESS_EXPR, INVESTOR_2_ADDRESS_EXPR, LOAN_CF_ADDRESS_EXPR,
-    LOAN_SHARES_ID, OWNER_ADDRESS_EXPR, USDC_TOKEN_ID,
+    LOAN_SHARES_ID, LOAN_SHARES_ID_EXPR, OWNER_ADDRESS_EXPR, USDC_TOKEN_ID,
 };
 
 impl LoanCfTestState {
@@ -68,8 +71,27 @@ impl LoanCfTestState {
         self.world.sc_deploy(
             ScDeployStep::new()
                 .from(OWNER_ADDRESS_EXPR)
-                .code(code)
+                .code(code.clone())
                 .call(self.contract.init()),
+        );
+
+        let mut acc = Account::new()
+            .esdt_roles(
+                LOAN_SHARES_ID_EXPR,
+                vec![
+                    "ESDTRoleNFTCreate".to_string(),
+                    "ESDTRoleNFTAddQuantity".to_string(),
+                ],
+            )
+            .code(code);
+        acc.storage.insert(
+            b"loan_share_token_identifier".to_vec().into(),
+            LOAN_SHARES_ID.as_bytes().into(),
+        );
+        self.world.set_state_step(
+            SetStateStep::new()
+                .new_token_identifier(LOAN_SHARES_ID_EXPR)
+                .put_account(LOAN_CF_ADDRESS_EXPR, acc),
         );
 
         self
@@ -121,7 +143,7 @@ impl LoanCfTestState {
         self.world.sc_call(
             ScCallStep::new()
                 .from(investor_address_expr)
-                .esdt_transfer(LOAN_SHARES_ID, nonce, amount)
+                .esdt_transfer(LOAN_SHARES_ID_EXPR, nonce, amount)
                 .call(self.contract.withdraw()),
         );
     }
@@ -136,7 +158,7 @@ impl LoanCfTestState {
         self.world.sc_call(
             ScCallStep::new()
                 .from(investor_address_expr)
-                .esdt_transfer(LOAN_SHARES_ID, nonce, amount)
+                .esdt_transfer(LOAN_SHARES_ID_EXPR, nonce, amount)
                 .call(self.contract.withdraw())
                 .expect(TxExpect::err(4, "str:".to_string() + err_msg)),
         );
@@ -146,7 +168,7 @@ impl LoanCfTestState {
         self.world.sc_call(
             ScCallStep::new()
                 .from(investor_address_expr)
-                .esdt_transfer(LOAN_SHARES_ID, shares_nonce, amount)
+                .esdt_transfer(LOAN_SHARES_ID_EXPR, shares_nonce, amount)
                 .call(self.contract.claim()),
         );
     }
