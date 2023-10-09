@@ -54,6 +54,12 @@ pub trait LoanCrowdfundScContract:
     fn invest(&self, project_id: u64) {
         let caller = self.blockchain().get_caller();
         self.require_address_is_kyc_compliant(&caller);
+
+        let payment = self.call_value().single_esdt();
+        let mut ctx = self.crowdfunding_state(project_id).get();
+        ctx.cf_progress += payment.amount;
+
+        self.crowdfunding_state(project_id).set(ctx);
     }
 
     #[endpoint(withdraw)]
