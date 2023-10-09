@@ -16,11 +16,12 @@ pub const ACCOUNT_BALANCE_EXPR: &str = "100,000,000";
 
 pub const USDC_TOKEN_ID: &str = "str:USDC-123456";
 pub const LOAN_SHARES_ID: &str = "REFRACTO-123456";
+pub const INVALID_TOKEN_ID_EXPR: &str = "str:RANDOMTKN-123456";
 
+pub mod bc_state_interactions;
 pub mod checks;
 pub mod interactions;
 pub mod mockups;
-pub mod bc_state_interactions;
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
