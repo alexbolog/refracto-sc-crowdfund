@@ -1,7 +1,9 @@
 multiversx_sc::imports!();
 
 #[multiversx_sc::module]
-pub trait AdminModule: crate::permissions::PermissionsModule {
+pub trait AdminModule:
+    crate::permissions::PermissionsModule + crate::storage::config::ConfigModule
+{
     #[endpoint(create)]
     fn create_project(
         &self,
@@ -25,4 +27,37 @@ pub trait AdminModule: crate::permissions::PermissionsModule {
 
     #[endpoint(adminDistributeRepayment)]
     fn admin_distribute_repayments(&self, project_id: u64) {}
+
+    #[payable("*")]
+    #[only_owner]
+    #[endpoint(issueAndSetRoles)]
+    fn issue_and_set_roles(&self, token_name: ManagedBuffer, token_ticker: ManagedBuffer) {
+        let issue_cost = self.call_value().egld_value().clone_value();
+        self.send()
+            .esdt_system_sc_proxy()
+            .issue_and_set_all_roles(
+                issue_cost,
+                token_name,
+                token_ticker,
+                EsdtTokenType::Meta,
+                18,
+            )
+            .async_call()
+            .with_callback(self.callbacks().issue_and_set_roles_callback())
+            .call_and_exit()
+    }
+
+    #[callback]
+    fn issue_and_set_roles_callback(
+        &self,
+        #[call_result] result: ManagedAsyncCallResult<EgldOrEsdtTokenIdentifier>,
+    ) {
+        match result {
+            ManagedAsyncCallResult::Ok(token_identifier) => {
+                self.loan_share_token_identifier()
+                    .set(token_identifier.as_esdt_option().unwrap());
+            }
+            ManagedAsyncCallResult::Err(_) => {}
+        }
+    }
 }
