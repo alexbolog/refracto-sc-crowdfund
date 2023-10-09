@@ -1,3 +1,5 @@
+use crate::types::crowdfunding_state::CrowdfundingStateContext;
+
 multiversx_sc::imports!();
 
 #[multiversx_sc::module]
@@ -19,14 +21,49 @@ pub trait AdminModule:
         cf_target_min: BigUint,
         cf_target_max: BigUint,
         loan_duration: u64,
+        loan_start_timestamp: u64,
     ) {
+        self.require_caller_is_admin();
+
+        require!(
+            self.crowdfunding_state(project_id).is_empty(),
+            "PROJECT ALREADY EXISTS"
+        );
+
+        let escrow_sc_address = self.deploy_escrow_sc();
+        let share_token_nonce =
+            self.mint_project_shares(&cf_target_max, &share_price_per_unit, &project_name);
+
+        let context = CrowdfundingStateContext::new(
+            project_id,
+            project_name,
+            project_payment_token,
+            daily_interest_rate,
+            daily_penalty_fee_rate,
+            developer_wallet,
+            share_token_nonce,
+            share_price_per_unit,
+            cf_start_timestamp,
+            cf_end_timestamp,
+            cf_target_min,
+            cf_target_max,
+            loan_duration,
+            loan_start_timestamp,
+            escrow_sc_address,
+        );
+
+        self.crowdfunding_state(project_id).set(context);
     }
 
     #[endpoint(cancel)]
-    fn cancel_project(&self, project_id: u64) {}
+    fn cancel_project(&self, project_id: u64) {
+        self.require_caller_is_admin();
+    }
 
     #[endpoint(adminDistributeRepayment)]
-    fn admin_distribute_repayments(&self, project_id: u64) {}
+    fn admin_distribute_repayments(&self, project_id: u64) {
+        self.require_caller_is_admin();
+    }
 
     #[payable("*")]
     #[only_owner]
@@ -78,5 +115,23 @@ pub trait AdminModule:
         );
 
         new_address
+    }
+
+    fn mint_project_shares(
+        &self,
+        cf_max_target: &BigUint,
+        price_per_share: &BigUint,
+        project_name: &ManagedBuffer,
+    ) -> u64 {
+        let token = self.loan_share_token_identifier().get();
+        let amount = self.get_max_shares_supply(cf_max_target, price_per_share);
+        let nonce = self
+            .send()
+            .esdt_nft_create_compact_named(&token, &amount, project_name, b"");
+        nonce
+    }
+
+    fn get_max_shares_supply(&self, cf_max_target: &BigUint, price_per_share: &BigUint) -> BigUint {
+        cf_max_target / price_per_share
     }
 }

@@ -6,6 +6,10 @@ pub trait PermissionsModule {
         self.admin_list().contains(address)
     }
 
+    fn require_caller_is_admin(&self) {
+        self.require_address_is_admin(&self.blockchain().get_caller());
+    }
+
     fn require_address_is_admin(&self, address: &ManagedAddress) {
         require!(
             self.is_address_admin(address),

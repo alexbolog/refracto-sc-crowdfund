@@ -23,12 +23,54 @@ pub struct CrowdfundingStateContext<M: ManagedTypeApi> {
     pub cf_target_max: BigUint<M>,
     pub cf_progress: BigUint<M>,
 
-    pub cf_state: ProjectFundingState,
     pub loan_duration: u64,
     pub loan_start_timestamp: u64,
     pub repayment_contract_address: ManagedAddress<M>,
     // add loan start time
     // add expected loan end time
+}
+
+impl<M: ManagedTypeApi> CrowdfundingStateContext<M> {
+    pub fn new(
+        project_id: u64,
+        project_name: ManagedBuffer<M>,
+        project_payment_token: TokenIdentifier<M>,
+        daily_interest_rate: u64,
+        daily_penalty_fee_rate: u64,
+        developer_wallet: ManagedAddress<M>,
+        share_token_nonce: u64,
+        share_price_per_unit: BigUint<M>,
+        cf_start_timestamp: u64,
+        cf_end_timestamp: u64,
+        cf_target_min: BigUint<M>,
+        cf_target_max: BigUint<M>,
+        loan_duration: u64,
+        loan_start_timestamp: u64,
+        repayment_contract_address: ManagedAddress<M>,
+    ) -> Self {
+        CrowdfundingStateContext {
+            project_id,
+            project_name,
+            project_payment_token,
+            daily_interest_rate,
+            daily_penalty_fee_rate,
+            developer_wallet,
+            share_token_nonce,
+            share_price_per_unit,
+            cf_start_timestamp,
+            cf_end_timestamp,
+            cf_target_min,
+            cf_target_max,
+            cf_progress: BigUint::zero(),
+            loan_duration,
+            loan_start_timestamp,
+            repayment_contract_address,
+        }
+    }
+
+    pub fn get_funding_state(&self) -> ProjectFundingState {
+        ProjectFundingState::Invalid
+    }
 }
 
 // Todo: impl getTotalSupply based on cf_progress and share_price_unit
