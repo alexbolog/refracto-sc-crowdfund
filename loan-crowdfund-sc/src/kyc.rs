@@ -1,3 +1,5 @@
+use crate::constants::ERR_KYC_NOT_DONE;
+
 multiversx_sc::imports!();
 
 #[multiversx_sc::module]
@@ -8,10 +10,7 @@ pub trait KycModule: crate::permissions::PermissionsModule {
     }
 
     fn require_address_is_kyc_compliant(&self, address: &ManagedAddress) {
-        require!(
-            self.get_is_kyc_compliant(address),
-            "Address is not KYC compliant"
-        );
+        require!(self.get_is_kyc_compliant(address), ERR_KYC_NOT_DONE);
     }
 
     #[endpoint(registerSuccessfulKyc)]
