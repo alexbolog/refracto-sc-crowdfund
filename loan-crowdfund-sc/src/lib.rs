@@ -66,7 +66,7 @@ pub trait LoanCrowdfundScContract:
 
         let mut cf_state = self.get_project_by_id_or_fail(project_id);
         self.require_state_is_active(&cf_state);
-        let payment = self.get_payment_or_fail_if_invalid(&cf_state);
+        let payment = self.get_invest_payment_or_fail_if_invalid(&cf_state);
 
         let shares = self.get_loan_shares(&cf_state, &payment.amount);
         self.send()
@@ -82,7 +82,10 @@ pub trait LoanCrowdfundScContract:
 
     #[payable("*")]
     #[endpoint(withdraw)]
-    fn withdraw(&self) {}
+    fn withdraw(&self) {
+        let payment = self.get_withdraw_payment_or_fail_if_invalid();
+        
+    }
 
     #[endpoint(claim)]
     fn claim(&self) {}
@@ -123,7 +126,7 @@ pub trait LoanCrowdfundScContract:
         state_strg.get()
     }
 
-    fn get_payment_or_fail_if_invalid(
+    fn get_invest_payment_or_fail_if_invalid(
         &self,
         cf_state: &CrowdfundingStateContext<Self::Api>,
     ) -> EsdtTokenPayment {
@@ -131,6 +134,17 @@ pub trait LoanCrowdfundScContract:
 
         require!(
             &payment.token_identifier == &cf_state.project_payment_token,
+            ERR_INVALID_PAYMENT_TOKEN
+        );
+
+        payment
+    }
+
+    fn get_withdraw_payment_or_fail_if_invalid(&self) -> EsdtTokenPayment {
+        let payment = self.call_value().single_esdt();
+
+        require!(
+            &payment.token_identifier == &self.loan_share_token_identifier().get(),
             ERR_INVALID_PAYMENT_TOKEN
         );
 

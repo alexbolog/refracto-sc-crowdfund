@@ -15,6 +15,10 @@ pub trait ConfigModule {
         project_id: u64,
     ) -> SingleValueMapper<CrowdfundingStateContext<Self::Api>>;
 
+    #[view(getProjectIdByLoanShareNonce)]
+    #[storage_mapper("project_id_by_loan_share_nonce")]
+    fn project_id_by_loan_share_nonce(&self, nonce: u64) -> SingleValueMapper<u64>;
+
     #[view(getSourceLoanRepaymentScAddress)]
     #[storage_mapper("source_loan_repayment_sc_address")]
     fn source_loan_repayment_sc_address(&self) -> SingleValueMapper<ManagedAddress>;

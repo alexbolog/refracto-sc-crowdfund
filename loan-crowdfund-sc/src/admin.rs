@@ -58,6 +58,8 @@ pub trait AdminModule:
         );
 
         self.crowdfunding_state(project_id).set(context);
+        self.project_id_by_loan_share_nonce(share_token_nonce)
+            .set(project_id);
     }
 
     #[endpoint(cancel)]
