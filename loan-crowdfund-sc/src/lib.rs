@@ -80,6 +80,7 @@ pub trait LoanCrowdfundScContract:
         );
     }
 
+    #[payable("*")]
     #[endpoint(withdraw)]
     fn withdraw(&self) {}
 
