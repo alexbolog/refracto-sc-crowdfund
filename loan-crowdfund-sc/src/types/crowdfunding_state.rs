@@ -74,44 +74,44 @@ impl<M: ManagedTypeApi> CrowdfundingStateContext<M> {
     }
 
     pub fn get_funding_state(
-    &self,
-    amount_cooling_off: &BigUint<M>,
-    block_timestamp: u64,
-) -> ProjectFundingState {
-    if self.is_cancelled {
-        return ProjectFundingState::CFCancelled;
-    }
-
-    if self.is_loan_active {
-        return ProjectFundingState::LoanActive;
-    }
-
-    if self.is_repayed {
-        return ProjectFundingState::Completed;
-    }
-
-    if block_timestamp < self.cf_start_timestamp {
-        return ProjectFundingState::Pending;
-    }
-
-    if block_timestamp >= self.cf_start_timestamp && block_timestamp <= self.cf_end_timestamp {
-        if &self.cf_progress < &self.cf_target_min {
-            return ProjectFundingState::CFActive;
+        &self,
+        amount_cooling_off: &BigUint<M>,
+        block_timestamp: u64,
+    ) -> ProjectFundingState {
+        if self.is_cancelled {
+            return ProjectFundingState::CFCancelled;
         }
-    }
 
-    if block_timestamp > self.cf_end_timestamp {
-        if &self.cf_progress < &self.cf_target_min {
-            return ProjectFundingState::CFFailed;
-        } else if &self.cf_progress - amount_cooling_off >= self.cf_target_min {
-            return ProjectFundingState::CFSuccessful;
-        } else {
-            return ProjectFundingState::CFWaitingCooloff;
+        if self.is_loan_active {
+            return ProjectFundingState::LoanActive;
         }
-    }
 
-    ProjectFundingState::Invalid
-}
+        if self.is_repayed {
+            return ProjectFundingState::Completed;
+        }
+
+        if block_timestamp < self.cf_start_timestamp {
+            return ProjectFundingState::Pending;
+        }
+
+        if block_timestamp >= self.cf_start_timestamp && block_timestamp <= self.cf_end_timestamp {
+            if &self.cf_progress < &self.cf_target_min {
+                return ProjectFundingState::CFActive;
+            }
+        }
+
+        if block_timestamp > self.cf_end_timestamp {
+            if &self.cf_progress < &self.cf_target_min {
+                return ProjectFundingState::CFFailed;
+            } else if &self.cf_progress - amount_cooling_off >= self.cf_target_min {
+                return ProjectFundingState::CFSuccessful;
+            } else {
+                return ProjectFundingState::CFWaitingCooloff;
+            }
+        }
+
+        ProjectFundingState::Invalid
+    }
 }
 
 // Todo: impl getTotalSupply based on cf_progress and share_price_unit
