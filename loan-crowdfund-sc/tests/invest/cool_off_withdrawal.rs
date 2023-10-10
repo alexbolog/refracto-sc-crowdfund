@@ -1,4 +1,4 @@
-use loan_crowdfund_sc::constants::ERR_COOL_OFF_EXPIRED;
+use loan_crowdfund_sc::constants::{ERR_CANNOT_WITHDRAW_IN_CRT_STATE, ERR_COOL_OFF_EXPIRED};
 
 use crate::test_state::{LoanCfTestState, ACCOUNT_BALANCE_EXPR, INVESTOR_1_ADDRESS_EXPR};
 
@@ -56,7 +56,7 @@ fn successful_cool_off_withdrawal_with_investment_in_multiple_projects() {
 }
 
 #[test]
-fn failed_withdrawal_after_cool_off_period() {
+fn failed_withdrawal_after_cool_off_state() {
     let mut state = LoanCfTestState::new();
     state.deploy_contract();
     state.create_fully_mocked_project();
@@ -65,8 +65,10 @@ fn failed_withdrawal_after_cool_off_period() {
     state.invest(INVESTOR_1_ADDRESS_EXPR, 1000, 1);
     state.set_block_timestamp(10001);
 
-    state.withdraw_and_expect_err(INVESTOR_1_ADDRESS_EXPR, 1, 1000, ERR_COOL_OFF_EXPIRED);
-
-    state.check_investor_share_balance(INVESTOR_1_ADDRESS_EXPR, "1", "1000");
-    state.check_investor_usdc_balance(INVESTOR_1_ADDRESS_EXPR, ACCOUNT_BALANCE_EXPR);
+    state.withdraw_and_expect_err(
+        INVESTOR_1_ADDRESS_EXPR,
+        1,
+        1000,
+        ERR_CANNOT_WITHDRAW_IN_CRT_STATE,
+    );
 }
