@@ -246,8 +246,8 @@ pub trait LoanCrowdfundScContract:
             ERR_CANNOT_WITHDRAW_IN_CRT_STATE
         );
         require!(
-            investment_timestamp + COOL_OFF_PERIOD < block_timestamp,
+            investment_timestamp + COOL_OFF_PERIOD > block_timestamp,
             ERR_WITHDRAW_EXPIRED
-        )
+        );
     }
 }
