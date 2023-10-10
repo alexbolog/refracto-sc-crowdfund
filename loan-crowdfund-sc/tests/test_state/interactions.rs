@@ -16,7 +16,7 @@ use multiversx_sc_scenario::{
 use super::{
     world, LoanCfContract, LoanCfTestState, ACCOUNT_BALANCE_EXPR, BENEFICIARY_ADDRESS_EXPR,
     INVALID_TOKEN_ID_EXPR, INVESTOR_1_ADDRESS_EXPR, INVESTOR_2_ADDRESS_EXPR, LOAN_CF_ADDRESS_EXPR,
-    LOAN_SHARES_ID, LOAN_SHARES_ID_EXPR, OWNER_ADDRESS_EXPR, USDC_TOKEN_ID,
+    LOAN_SHARES_ID, LOAN_SHARES_ID_EXPR, OWNER_ADDRESS_EXPR, USDC_TOKEN_ID_EXPR,
 };
 
 impl LoanCfTestState {
@@ -35,7 +35,7 @@ impl LoanCfTestState {
                     Account::new()
                         .nonce(1)
                         .balance(ACCOUNT_BALANCE_EXPR)
-                        .esdt_balance(USDC_TOKEN_ID, ACCOUNT_BALANCE_EXPR)
+                        .esdt_balance(USDC_TOKEN_ID_EXPR, ACCOUNT_BALANCE_EXPR)
                         .esdt_balance(INVALID_TOKEN_ID_EXPR, ACCOUNT_BALANCE_EXPR),
                 )
                 .put_account(
@@ -43,7 +43,7 @@ impl LoanCfTestState {
                     Account::new()
                         .nonce(1)
                         .balance(ACCOUNT_BALANCE_EXPR)
-                        .esdt_balance(USDC_TOKEN_ID, ACCOUNT_BALANCE_EXPR)
+                        .esdt_balance(USDC_TOKEN_ID_EXPR, ACCOUNT_BALANCE_EXPR)
                         .esdt_balance(INVALID_TOKEN_ID_EXPR, ACCOUNT_BALANCE_EXPR),
                 )
                 .block_timestamp(COOL_OFF_PERIOD),
@@ -101,7 +101,7 @@ impl LoanCfTestState {
         self.world.sc_call(
             ScCallStep::new()
                 .from(investor_address_expr)
-                .esdt_transfer(USDC_TOKEN_ID, 0, amount)
+                .esdt_transfer(USDC_TOKEN_ID_EXPR, 0, amount)
                 .call(self.contract.invest(project_id)),
         );
     }
@@ -116,7 +116,7 @@ impl LoanCfTestState {
         self.world.sc_call(
             ScCallStep::new()
                 .from(investor_address_expr)
-                .esdt_transfer(USDC_TOKEN_ID, 0, amount)
+                .esdt_transfer(USDC_TOKEN_ID_EXPR, 0, amount)
                 .call(self.contract.invest(project_id))
                 .expect(TxExpect::err(4, "str:".to_string() + err_msg)),
         );
@@ -244,7 +244,7 @@ impl LoanCfTestState {
         // self.world.sc_call(
         //     ScCallStep::new()
         //         .from(BENEFICIARY_ADDRESS_EXPR)
-        //         .esdt_transfer(USDC_TOKEN_ID, 0, amount)
+        //         .esdt_transfer(USDC_TOKEN_ID_EXPR, 0, amount)
         //         .call(self.contract.repay_loan(project_id)),
         // );
     }
