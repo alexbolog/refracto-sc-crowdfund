@@ -94,7 +94,7 @@ pub trait LoanCrowdfundScContract:
             &cf_state.share_price_per_unit,
         );
         let recorded_payment =
-            self.get_recorded_payment(cf_state.project_id, &caller, &investment_amount);
+            self.get_oldest_recorded_payment(cf_state.project_id, &caller, &investment_amount);
 
         self.require_withdraw_is_possible(&cf_state, recorded_payment.1);
 
@@ -164,19 +164,29 @@ pub trait LoanCrowdfundScContract:
         shares_amount * price_per_share
     }
 
-    fn get_recorded_payment(
+    fn get_oldest_recorded_payment(
         &self,
         project_id: u64,
         caller: &ManagedAddress,
         investment_token_amount: &BigUint,
     ) -> (ManagedAddress, u64, BigUint) {
+        let mut oldest_ts = u64::MAX;
+        let mut oldest_recorded_payment = (ManagedAddress::zero(), 0, BigUint::zero());
+
         for recorded_payment in self.recorded_payments(project_id).iter() {
             let (address, timestamp, recorded_amount) = recorded_payment;
             if &address == caller && &recorded_amount == investment_token_amount {
-                return (address, timestamp, recorded_amount);
+                // return (address, timestamp, recorded_amount);
+                if oldest_ts > timestamp {
+                    oldest_ts = timestamp;
+                    oldest_recorded_payment = (address, timestamp, recorded_amount);
+                }
             }
         }
-        sc_panic!(ERR_INVESTMENT_NOT_FOUND);
+        
+        require!(oldest_ts != u64::MAX, ERR_INVESTMENT_NOT_FOUND);
+
+        oldest_recorded_payment
     }
 
     fn get_project_by_id_or_fail(&self, project_id: u64) -> CrowdfundingStateContext<Self::Api> {
