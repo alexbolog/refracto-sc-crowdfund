@@ -9,12 +9,13 @@ pub trait CommonModule:
     #[view(getExpectedInterest)]
     fn get_expected_interest(&self, project_id: u64) -> BigUint {
         let state = self.crowdfunding_state(project_id).get();
-        state.get_current_interest(self.blockchain().get_block_timestamp())
+        state.get_accrued_interest(self.blockchain().get_block_timestamp())
     }
 
     #[view(getExpectedLateFees)]
     fn get_expected_late_fees(&self, project_id: u64) -> BigUint {
-        todo!()
+        let state = self.crowdfunding_state(project_id).get();
+        state.get_accrued_penalty(self.blockchain().get_block_timestamp())
     }
 
     #[view(getTotalAmount)]

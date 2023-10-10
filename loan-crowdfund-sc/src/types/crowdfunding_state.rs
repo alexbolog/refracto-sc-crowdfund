@@ -113,7 +113,7 @@ impl<M: ManagedTypeApi> CrowdfundingStateContext<M> {
         ProjectFundingState::Invalid
     }
 
-    pub fn get_current_interest(&self, block_timestamp: u64) -> BigUint<M> {
+    pub fn get_accrued_interest(&self, block_timestamp: u64) -> BigUint<M> {
         if block_timestamp < self.loan_start_timestamp {
             return BigUint::zero();
         }
@@ -128,6 +128,28 @@ impl<M: ManagedTypeApi> CrowdfundingStateContext<M> {
             .div(INTEREST_RATE_DENOMINATION);
 
         interest
+    }
+
+    pub fn get_expected_loan_repayment_timestamp(&self) -> u64 {
+        self.loan_start_timestamp + self.loan_duration
+    }
+
+    pub fn get_accrued_penalty(&self, block_timestamp: u64) -> BigUint<M> {
+        let expected_loan_repayment_timestamp = self.get_expected_loan_repayment_timestamp();
+        if block_timestamp < expected_loan_repayment_timestamp {
+            return BigUint::zero();
+        }
+
+        let days = (block_timestamp - expected_loan_repayment_timestamp) / (24 * 3600);
+
+        let penalty = self
+            .cf_progress
+            .clone()
+            .mul(self.daily_penalty_fee_rate)
+            .mul(days)
+            .div(INTEREST_RATE_DENOMINATION);
+
+        penalty
     }
 }
 
