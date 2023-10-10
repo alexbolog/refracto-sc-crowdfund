@@ -17,7 +17,7 @@ fn successful_cool_off_withdrawal() {
     state.withdraw(INVESTOR_1_ADDRESS_EXPR, 1, 1000);
 
     state.check_investor_share_balance(INVESTOR_1_ADDRESS_EXPR, "1", "0");
-    state.check_investor_usdc_balance(INVESTOR_1_ADDRESS_EXPR, ACCOUNT_BALANCE_EXPR);
+    state.check_address_usdc_balance(INVESTOR_1_ADDRESS_EXPR, ACCOUNT_BALANCE_EXPR);
 }
 
 #[test]
@@ -36,7 +36,7 @@ fn successful_cool_off_withdrawal_with_multiple_investments() {
     state.withdraw(INVESTOR_1_ADDRESS_EXPR, 1, 1000);
 
     state.check_investor_share_balance(INVESTOR_1_ADDRESS_EXPR, "1", "0");
-    state.check_investor_usdc_balance(INVESTOR_1_ADDRESS_EXPR, ACCOUNT_BALANCE_EXPR);
+    state.check_address_usdc_balance(INVESTOR_1_ADDRESS_EXPR, ACCOUNT_BALANCE_EXPR);
 }
 
 #[test]
@@ -56,7 +56,7 @@ fn successful_cool_off_withdrawal_with_investment_in_multiple_projects() {
 
     state.check_investor_share_balance(INVESTOR_1_ADDRESS_EXPR, "1", "0");
     state.check_investor_share_balance(INVESTOR_1_ADDRESS_EXPR, "2", "0");
-    state.check_investor_usdc_balance(INVESTOR_1_ADDRESS_EXPR, ACCOUNT_BALANCE_EXPR);
+    state.check_address_usdc_balance(INVESTOR_1_ADDRESS_EXPR, ACCOUNT_BALANCE_EXPR);
 }
 
 #[test]
