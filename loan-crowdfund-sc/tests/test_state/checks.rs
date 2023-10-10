@@ -28,7 +28,7 @@ impl LoanCfTestState {
         );
     }
 
-    pub fn check_investor_usdc_balance(&mut self, address_expr: &str, expected_balance_expr: &str) {
+    pub fn check_address_usdc_balance(&mut self, address_expr: &str, expected_balance_expr: &str) {
         self.world
             .check_state_step(CheckStateStep::new().put_account(
                 address_expr,
