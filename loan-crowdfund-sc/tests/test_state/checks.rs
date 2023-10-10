@@ -36,7 +36,7 @@ impl LoanCfTestState {
             ));
     }
 
-    pub fn check_investor_share_balance(
+    pub fn check_address_share_balance(
         &mut self,
         address_expr: &str,
         nonce_expr: &str,
