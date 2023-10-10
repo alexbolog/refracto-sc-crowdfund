@@ -25,6 +25,7 @@ fn interest_applied_correctly() {
 
     let mut state = LoanCfTestState::new();
     state.deploy_contract();
+    state.whitelist_address(INVESTOR_1_ADDRESS_EXPR);
     state.create_mocked_project_explicit_financing_details(
         project_id,
         total_principal,
@@ -35,7 +36,7 @@ fn interest_applied_correctly() {
     );
 
     state.set_block_timestamp(101);
-    state.invest("investor_1", total_principal, project_id);
+    state.invest(INVESTOR_1_ADDRESS_EXPR, total_principal, project_id);
 
     state.set_block_timestamp(target_timestamp);
 
