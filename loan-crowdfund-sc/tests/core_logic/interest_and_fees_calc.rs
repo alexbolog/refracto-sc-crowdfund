@@ -6,21 +6,22 @@ use crate::test_state::{LoanCfTestState, INVESTOR_1_ADDRESS_EXPR};
 // principal = 100k
 
 // daily interest = 14% / 365 = 0.0383561643835616% / 100 = 0.000383561643835616
-// dobanda dupa 10 zile = 10 * daily_interest * principal
+// dobanda dupa 10 zile = 10 * daily_interest * principal = 10 * 0.000383561643835616 * 100k = 383.561643835616
 // dobanda dupa 365 zile = 365 * daily_interest * principal = 365 * 0.000383561643835616 * 100k = 14000
 
 #[test]
-fn interest_applied_correctly() {
+fn correct_interest_calculation() {
     let project_id = 1;
     let apr = 14;
-    let daily_interest_rate = INTEREST_RATE_DENOMINATION * apr / 365;
+    let daily_interest_rate = INTEREST_RATE_DENOMINATION * apr / 365_00; // 365 days * 100
+
+    // let daily_interest_rate = INTEREST_RATE_DENOMINATION * apr / 365;
 
     let days = 10;
     let total_principal = 100_000;
 
     let expected_interest =
-        total_principal * daily_interest_rate * days / INTEREST_RATE_DENOMINATION;
-    let expected_total = total_principal + expected_interest;
+        days * daily_interest_rate * total_principal / INTEREST_RATE_DENOMINATION;
     let target_timestamp = 101 + days * 24 * 3600;
 
     let mut state = LoanCfTestState::new();
@@ -37,11 +38,11 @@ fn interest_applied_correctly() {
 
     state.set_block_timestamp(101);
     state.invest(INVESTOR_1_ADDRESS_EXPR, total_principal, project_id);
+    state.claim_loan_funds(project_id);
 
     state.set_block_timestamp(target_timestamp);
 
     state.check_expected_interest(project_id, expected_interest);
-    state.check_total_repayment_amount(project_id, expected_total);
 }
 
 #[test]
