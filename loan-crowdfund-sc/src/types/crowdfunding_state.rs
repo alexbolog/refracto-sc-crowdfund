@@ -112,6 +112,22 @@ impl<M: ManagedTypeApi> CrowdfundingStateContext<M> {
 
         ProjectFundingState::Invalid
     }
+
+    pub fn get_current_interest(&self, block_timestamp: u64) -> BigUint<M> {
+        if block_timestamp < self.loan_start_timestamp || !self.is_loan_active {
+            return BigUint::zero();
+        }
+
+        let days = (block_timestamp - self.loan_start_timestamp) / (24 * 3600);
+        let interest = self
+            .cf_progress
+            .clone()
+            .mul(self.daily_interest_rate)
+            .mul(days)
+            .div(INTEREST_RATE_DENOMINATION);
+
+        interest
+    }
 }
 
 // Todo: impl getTotalSupply based on cf_progress and share_price_unit
