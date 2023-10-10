@@ -27,7 +27,7 @@ impl LoanCfTestState {
     pub fn create_mocked_project_explicit_proj_id(&mut self, project_id: u64) {
         self.create_mocked_project_explicit_financing_details(
             project_id,
-            90000,
+            9000,
             10000,
             100,
             100,

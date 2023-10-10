@@ -26,7 +26,7 @@ fn failed_invest_during_funding_state_successful() {
     state.deploy_contract();
     state.create_fully_mocked_project();
     state.set_block_timestamp(101);
-    state.invest(INVESTOR_1_ADDRESS_EXPR, 90001, 1);
+    state.invest(INVESTOR_1_ADDRESS_EXPR, 9001, 1);
     state.set_block_timestamp(10001);
 
     state.check_funding_state(1, ProjectFundingState::CFSuccessful);
@@ -77,7 +77,7 @@ fn failed_invest_during_funding_state_loan_active() {
     state.deploy_contract();
     state.create_fully_mocked_project();
     state.set_block_timestamp(101);
-    state.invest(INVESTOR_1_ADDRESS_EXPR, 90001, 1);
+    state.invest(INVESTOR_1_ADDRESS_EXPR, 9001, 1);
     state.set_block_timestamp(10001);
     state.claim(INVESTOR_1_ADDRESS_EXPR, 1, 1);
 
@@ -97,7 +97,7 @@ fn failed_invest_during_funding_state_completed() {
     state.deploy_contract();
     state.create_fully_mocked_project();
     state.set_block_timestamp(101);
-    state.invest(INVESTOR_1_ADDRESS_EXPR, 90001, 1);
+    state.invest(INVESTOR_1_ADDRESS_EXPR, 9001, 1);
     state.set_block_timestamp(10001);
     state.claim_loan_funds(1);
 
