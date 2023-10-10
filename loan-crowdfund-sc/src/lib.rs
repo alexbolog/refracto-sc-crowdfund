@@ -31,8 +31,8 @@ use types::crowdfunding_state::CrowdfundingStateContext;
 use crate::{
     constants::{
         COOL_OFF_PERIOD, ERR_CANNOT_INVEST_IN_CRT_STATE, ERR_CANNOT_WITHDRAW_IN_CRT_STATE,
-        ERR_INVALID_PAYMENT_NONCE, ERR_INVALID_PAYMENT_TOKEN, ERR_INVALID_PROJECT_ID,
-        ERR_INVESTMENT_NOT_FOUND, ERR_WITHDRAW_EXPIRED,
+        ERR_COOL_OFF_EXPIRED, ERR_INVALID_PAYMENT_NONCE, ERR_INVALID_PAYMENT_TOKEN,
+        ERR_INVALID_PROJECT_ID, ERR_INVESTMENT_NOT_FOUND,
     },
     types::crowdfunding_state::ProjectFundingState,
 };
@@ -247,7 +247,7 @@ pub trait LoanCrowdfundScContract:
         );
         require!(
             investment_timestamp + COOL_OFF_PERIOD > block_timestamp,
-            ERR_WITHDRAW_EXPIRED
+            ERR_COOL_OFF_EXPIRED
         );
     }
 }

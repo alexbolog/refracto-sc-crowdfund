@@ -9,4 +9,3 @@ pub const ERR_INVALID_PAYMENT_TOKEN: &str = "Invalid payment token";
 pub const ERR_INVALID_PAYMENT_NONCE: &str = "Invalid payment nonce";
 pub const ERR_INVESTMENT_NOT_FOUND: &str = "Investment not found";
 pub const ERR_CANNOT_WITHDRAW_IN_CRT_STATE: &str = "Cannot withdraw in current funding state";
-pub const ERR_WITHDRAW_EXPIRED: &str = "Cannot withdraw, cool off period expired";
