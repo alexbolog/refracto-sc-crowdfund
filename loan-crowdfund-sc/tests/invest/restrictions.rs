@@ -3,115 +3,36 @@ use loan_crowdfund_sc::{
     types::crowdfunding_state::ProjectFundingState,
 };
 
-use crate::test_state::{LoanCfTestState, INVESTOR_1_ADDRESS_EXPR};
+use crate::test_state::{
+    mockups::MOCKUP_CF_TIMESTAMP_AFTER_START, LoanCfTestState, INVESTOR_1_ADDRESS_EXPR,
+};
 
 #[test]
-fn failed_invest_during_funding_state_pending() {
-    let mut state = LoanCfTestState::new();
-    state.deploy_contract();
-    state.create_fully_mocked_project();
+fn investing_is_only_allowed_with_cf_active() {
+    let project_funding_states = [
+        // ProjectFundingState::Invalid,
+        ProjectFundingState::Pending,
+        ProjectFundingState::CFWaitingCooloff,
+        ProjectFundingState::CFSuccessful,
+        ProjectFundingState::CFFailed,
+        ProjectFundingState::CFCancelled,
+        ProjectFundingState::LoanActive,
+        // TODO: Uncomment when completed state is implemented in mockups
+        // ProjectFundingState::Completed,
+    ];
 
-    state.check_funding_state(1, ProjectFundingState::Pending);
-    state.invest_and_expect_err(
-        INVESTOR_1_ADDRESS_EXPR,
-        100,
-        1,
-        ERR_CANNOT_INVEST_IN_CRT_STATE,
-    );
-}
-
-#[test]
-fn failed_invest_during_funding_state_successful() {
-    let mut state = LoanCfTestState::new();
-    state.deploy_contract();
-    state.create_fully_mocked_project();
-    state.set_block_timestamp(101);
-    state.invest(INVESTOR_1_ADDRESS_EXPR, 9001, 1);
-    state.set_block_timestamp(10001);
-
-    state.check_funding_state(1, ProjectFundingState::CFSuccessful);
-
-    state.invest_and_expect_err(
-        INVESTOR_1_ADDRESS_EXPR,
-        100,
-        1,
-        ERR_CANNOT_INVEST_IN_CRT_STATE,
-    );
-}
-
-#[test]
-fn failed_invest_during_funding_state_failed() {
-    let mut state = LoanCfTestState::new();
-    state.deploy_contract();
-    state.create_fully_mocked_project();
-    state.set_block_timestamp(10001);
-
-    state.check_funding_state(1, ProjectFundingState::CFFailed);
-
-    state.invest_and_expect_err(
-        INVESTOR_1_ADDRESS_EXPR,
-        100,
-        1,
-        ERR_CANNOT_INVEST_IN_CRT_STATE,
-    );
-}
-
-#[test]
-fn failed_invest_during_funding_state_cancelled() {
-    let mut state = LoanCfTestState::new();
-    state.deploy_contract();
-    state.create_fully_mocked_project();
-    state.cancel_project(1);
-
-    state.invest_and_expect_err(
-        INVESTOR_1_ADDRESS_EXPR,
-        100,
-        1,
-        ERR_CANNOT_INVEST_IN_CRT_STATE,
-    );
-}
-
-#[test]
-fn failed_invest_during_funding_state_loan_active() {
-    let mut state = LoanCfTestState::new();
-    state.deploy_contract();
-    state.create_fully_mocked_project();
-    state.set_block_timestamp(101);
-    state.invest(INVESTOR_1_ADDRESS_EXPR, 9001, 1);
-    state.set_block_timestamp(10001);
-    state.claim(INVESTOR_1_ADDRESS_EXPR, 1, 1);
-
-    state.check_funding_state(1, ProjectFundingState::LoanActive);
-
-    state.invest_and_expect_err(
-        INVESTOR_1_ADDRESS_EXPR,
-        100,
-        1,
-        ERR_CANNOT_INVEST_IN_CRT_STATE,
-    );
-}
-
-#[test]
-fn failed_invest_during_funding_state_completed() {
-    let mut state = LoanCfTestState::new();
-    state.deploy_contract();
-    state.create_fully_mocked_project();
-    state.set_block_timestamp(101);
-    state.invest(INVESTOR_1_ADDRESS_EXPR, 9001, 1);
-    state.set_block_timestamp(10001);
-    state.claim_loan_funds(1);
-
-    state.repay_loan(1, 11000);
-    state.admin_distribute_repayment(1);
-
-    state.check_funding_state(1, ProjectFundingState::Completed);
-
-    state.invest_and_expect_err(
-        INVESTOR_1_ADDRESS_EXPR,
-        100,
-        1,
-        ERR_CANNOT_INVEST_IN_CRT_STATE,
-    );
+    for funding_state in project_funding_states.iter() {
+        let mut state = LoanCfTestState::new();
+        state.deploy_contract();
+        state.create_default_mockup_in_state(1, &funding_state);
+        state.check_funding_state(1, funding_state.clone());
+        state.invest_and_expect_err(
+            INVESTOR_1_ADDRESS_EXPR,
+            100,
+            1,
+            ERR_CANNOT_INVEST_IN_CRT_STATE,
+        );
+    }
 }
 
 #[test]
@@ -119,8 +40,16 @@ fn failed_over_financing() {
     let mut state = LoanCfTestState::new();
     state.deploy_contract();
     state.create_fully_mocked_project();
-    state.set_block_timestamp(101);
+    state.set_block_timestamp(MOCKUP_CF_TIMESTAMP_AFTER_START);
     state.invest(INVESTOR_1_ADDRESS_EXPR, 99999, 1);
 
     state.invest_and_expect_err(INVESTOR_1_ADDRESS_EXPR, 100, 1, ERR_CANNOT_OVER_FINANCE)
+}
+
+#[test]
+fn test_mockup_maker() {
+    let mut state = LoanCfTestState::new();
+    state.deploy_contract();
+    state.create_default_mockup_in_state(1, &ProjectFundingState::CFSuccessful);
+    state.check_funding_state(1, ProjectFundingState::CFSuccessful);
 }

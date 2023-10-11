@@ -19,6 +19,16 @@ use super::{
     OWNER_ADDRESS_EXPR, USDC_TOKEN_ID, USDC_TOKEN_ID_EXPR,
 };
 
+pub const MOCKUP_CF_START_TIMESTAMP: u64 = 100;
+pub const MOCKUP_CF_END_TIMESTAMP: u64 = 100000 + COOL_OFF_PERIOD;
+pub const MOCKUP_CF_TIMESTAMP_AFTER_START: u64 = MOCKUP_CF_START_TIMESTAMP + 1;
+pub const MOCKUP_CF_TIMESTAMP_AFTER_END: u64 = MOCKUP_CF_END_TIMESTAMP + 1;
+pub const MOCKUP_CF_TIMESTAMP_BEFORE_END: u64 = MOCKUP_CF_END_TIMESTAMP - 1;
+
+pub const MOCKUP_CF_DEFAULT_MIN_PRINCIPAL: u64 = 9000;
+pub const MOCKUP_CF_DEFAULT_MAX_PRINCIPAL: u64 = 10000;
+pub const MOCKUP_CF_DEFAULT_COVER_MIN_PRINCIPAL: u64 = 9001;
+
 impl LoanCfTestState {
     pub fn create_fully_mocked_project(&mut self) {
         self.create_mocked_project_explicit_proj_id(1);
@@ -27,8 +37,8 @@ impl LoanCfTestState {
     pub fn create_mocked_project_explicit_proj_id(&mut self, project_id: u64) {
         self.create_mocked_project_explicit_financing_details(
             project_id,
-            9000,
-            10000,
+            MOCKUP_CF_DEFAULT_MIN_PRINCIPAL,
+            MOCKUP_CF_DEFAULT_MAX_PRINCIPAL,
             100,
             100,
             12 * 30 * 24 * 60 * 60, // one year
@@ -52,8 +62,8 @@ impl LoanCfTestState {
             daily_penalty_fee,
             self.beneficiary_address.clone(),
             1,
-            100 + COOL_OFF_PERIOD,
-            10000 + COOL_OFF_PERIOD,
+            MOCKUP_CF_START_TIMESTAMP + COOL_OFF_PERIOD,
+            MOCKUP_CF_END_TIMESTAMP + COOL_OFF_PERIOD,
             principal_min,
             principal_max,
             loan_duration,
@@ -68,28 +78,40 @@ impl LoanCfTestState {
             ProjectFundingState::Pending => {}
             ProjectFundingState::Invalid => {}
             ProjectFundingState::CFActive => {
-                self.set_block_timestamp(101);
+                self.set_block_timestamp(MOCKUP_CF_TIMESTAMP_AFTER_START);
             }
             ProjectFundingState::CFWaitingCooloff => {
-                self.set_block_timestamp(9999);
-                self.invest(INVESTOR_1_ADDRESS_EXPR, 9001, project_id);
-                self.set_block_timestamp(100001);
+                self.set_block_timestamp(MOCKUP_CF_TIMESTAMP_BEFORE_END);
+                self.invest(
+                    INVESTOR_1_ADDRESS_EXPR,
+                    MOCKUP_CF_DEFAULT_COVER_MIN_PRINCIPAL,
+                    project_id,
+                );
+                self.set_block_timestamp(MOCKUP_CF_TIMESTAMP_AFTER_END);
             }
             ProjectFundingState::CFSuccessful => {
-                self.set_block_timestamp(101);
-                self.invest(INVESTOR_1_ADDRESS_EXPR, 9001, project_id);
-                self.set_block_timestamp(100001);
+                self.set_block_timestamp(MOCKUP_CF_TIMESTAMP_AFTER_START);
+                self.invest(
+                    INVESTOR_1_ADDRESS_EXPR,
+                    MOCKUP_CF_DEFAULT_COVER_MIN_PRINCIPAL,
+                    project_id,
+                );
+                self.set_block_timestamp(MOCKUP_CF_TIMESTAMP_AFTER_END);
             }
             ProjectFundingState::CFFailed => {
-                self.set_block_timestamp(100001);
+                self.set_block_timestamp(MOCKUP_CF_TIMESTAMP_AFTER_END);
             }
             ProjectFundingState::CFCancelled => {
                 self.cancel_project(project_id);
             }
             ProjectFundingState::LoanActive => {
-                self.set_block_timestamp(101);
-                self.invest(INVESTOR_1_ADDRESS_EXPR, 9001, project_id);
-                self.set_block_timestamp(100001);
+                self.set_block_timestamp(MOCKUP_CF_TIMESTAMP_AFTER_START);
+                self.invest(
+                    INVESTOR_1_ADDRESS_EXPR,
+                    MOCKUP_CF_DEFAULT_COVER_MIN_PRINCIPAL,
+                    project_id,
+                );
+                self.set_block_timestamp(MOCKUP_CF_TIMESTAMP_AFTER_END);
                 self.claim_loan_funds(project_id);
             }
             ProjectFundingState::Completed => {

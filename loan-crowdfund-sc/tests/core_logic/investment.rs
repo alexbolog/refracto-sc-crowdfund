@@ -3,7 +3,10 @@ use loan_crowdfund_sc::constants::{
     ERR_KYC_NOT_DONE,
 };
 
-use crate::test_state::{LoanCfTestState, INVALID_TOKEN_ID_EXPR, INVESTOR_1_ADDRESS_EXPR};
+use crate::test_state::{
+    mockups::MOCKUP_CF_TIMESTAMP_AFTER_START, LoanCfTestState, INVALID_TOKEN_ID_EXPR,
+    INVESTOR_1_ADDRESS_EXPR,
+};
 
 #[test]
 fn invest_fails_without_kyc_whitelist() {
@@ -44,7 +47,7 @@ fn invest_fails_with_invalid_payment_token() {
     let mut state = LoanCfTestState::new();
     state.deploy_contract();
     state.create_fully_mocked_project();
-    state.set_block_timestamp(101);
+    state.set_block_timestamp(MOCKUP_CF_TIMESTAMP_AFTER_START);
     state.whitelist_address(INVESTOR_1_ADDRESS_EXPR);
 
     state.explicit_invest_and_expect_err(

@@ -1,6 +1,6 @@
 use loan_crowdfund_sc::types::crowdfunding_state::INTEREST_RATE_DENOMINATION;
 
-use crate::test_state::{LoanCfTestState, INVESTOR_1_ADDRESS_EXPR};
+use crate::test_state::{LoanCfTestState, INVESTOR_1_ADDRESS_EXPR, mockups::MOCKUP_CF_TIMESTAMP_AFTER_START};
 
 // interest = 14%
 // principal = 100k
@@ -22,7 +22,7 @@ fn correct_interest_calculation() {
 
     let expected_interest =
         days * daily_interest_rate * total_principal / INTEREST_RATE_DENOMINATION;
-    let target_timestamp = 101 + days * 24 * 3600;
+    let target_timestamp = MOCKUP_CF_TIMESTAMP_AFTER_START + days * 24 * 3600;
 
     let mut state = LoanCfTestState::new();
     state.deploy_contract();
@@ -36,7 +36,7 @@ fn correct_interest_calculation() {
         ONE_YEAR,
     );
 
-    state.set_block_timestamp(101);
+    state.set_block_timestamp(MOCKUP_CF_TIMESTAMP_AFTER_START);
     state.invest(INVESTOR_1_ADDRESS_EXPR, total_principal, project_id);
     state.claim_loan_funds(project_id);
 
@@ -55,7 +55,7 @@ fn correct_late_fees_calculation() {
     let total_principal = 100_000;
 
     let expected_fees = days * daily_penalty_rate * total_principal / INTEREST_RATE_DENOMINATION;
-    let target_timestamp = 101 + ONE_YEAR + days * 24 * 3600;
+    let target_timestamp = MOCKUP_CF_TIMESTAMP_AFTER_START + ONE_YEAR + days * 24 * 3600;
 
     let mut state = LoanCfTestState::new();
     state.deploy_contract();
@@ -68,7 +68,7 @@ fn correct_late_fees_calculation() {
         daily_penalty_rate,
         ONE_YEAR,
     );
-    state.set_block_timestamp(101);
+    state.set_block_timestamp(MOCKUP_CF_TIMESTAMP_AFTER_START);
     state.invest(INVESTOR_1_ADDRESS_EXPR, total_principal, project_id);
     state.claim_loan_funds(project_id);
 
@@ -110,7 +110,7 @@ fn interest_and_late_fees_applied_correctly() {
         daily_penalty_rate,
         ONE_YEAR,
     );
-    state.set_block_timestamp(101);
+    state.set_block_timestamp(MOCKUP_CF_TIMESTAMP_AFTER_START);
     state.invest(INVESTOR_1_ADDRESS_EXPR, total_principal, project_id);
     state.set_block_timestamp(102);
     state.claim_loan_funds(project_id);
