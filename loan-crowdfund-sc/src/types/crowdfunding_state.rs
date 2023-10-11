@@ -151,6 +151,13 @@ impl<M: ManagedTypeApi> CrowdfundingStateContext<M> {
 
         penalty
     }
+
+    pub fn get_total_amount_due(&self, block_timestamp: u64) -> BigUint<M> {
+        let interest = self.get_accrued_interest(block_timestamp);
+        let penalty = self.get_accrued_penalty(block_timestamp);
+
+        &self.cf_progress + &interest + &penalty
+    }
 }
 
 // Todo: impl getTotalSupply based on cf_progress and share_price_unit

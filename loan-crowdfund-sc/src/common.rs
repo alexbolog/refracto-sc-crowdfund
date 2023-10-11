@@ -20,7 +20,8 @@ pub trait CommonModule:
 
     #[view(getTotalAmount)]
     fn get_total_amount(&self, project_id: u64) -> BigUint {
-        todo!()
+        let state = self.crowdfunding_state(project_id).get();
+        state.get_total_amount_due(self.blockchain().get_block_timestamp())
     }
 
     #[view(getFundingState)]
