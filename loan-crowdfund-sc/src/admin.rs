@@ -30,10 +30,8 @@ pub trait AdminModule:
             "PROJECT ALREADY EXISTS"
         );
 
-        // TODO: uncomment when escrow sc tests are ready
-        // let escrow_sc_address = self.deploy_escrow_sc();
+        let escrow_sc_address = self.deploy_escrow_sc();
 
-        // TODO: uncomment after fixing test minting
         let share_token_nonce =
             self.mint_project_shares(&cf_target_max, &share_price_per_unit, &project_name);
 
@@ -53,8 +51,7 @@ pub trait AdminModule:
             cf_target_max,
             loan_duration,
             loan_start_timestamp,
-            // escrow_sc_address,
-            ManagedAddress::zero(),
+            escrow_sc_address,
         );
 
         self.crowdfunding_state(project_id).set(context);
