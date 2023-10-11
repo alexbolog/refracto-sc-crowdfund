@@ -5,6 +5,8 @@ fn invest_yields_correct_number_of_shares() {
     let mut state = LoanCfTestState::new();
     state.deploy_contract();
     state.create_fully_mocked_project();
+    state.whitelist_address(INVESTOR_1_ADDRESS_EXPR);
+    state.set_block_timestamp(101);
 
     state.invest(INVESTOR_1_ADDRESS_EXPR, 1000, 1);
 
@@ -17,6 +19,8 @@ fn invest_yields_correct_share_nonce() {
     state.deploy_contract();
     state.create_fully_mocked_project();
     state.create_mocked_project_explicit_proj_id(2);
+    state.whitelist_address(INVESTOR_1_ADDRESS_EXPR);
+    state.set_block_timestamp(101);
 
     state.invest(INVESTOR_1_ADDRESS_EXPR, 1000, 2);
     state.check_address_share_balance(INVESTOR_1_ADDRESS_EXPR, "1", "0");
