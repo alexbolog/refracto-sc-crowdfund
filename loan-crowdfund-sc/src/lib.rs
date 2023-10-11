@@ -58,7 +58,10 @@ pub trait LoanCrowdfundScContract:
     + common::CommonModule
 {
     #[init]
-    fn init(&self) {}
+    fn init(&self, source_loan_repayment_sc_address: ManagedAddress) {
+        self.source_loan_repayment_sc_address()
+            .set_if_empty(&source_loan_repayment_sc_address);
+    }
 
     #[payable("*")]
     #[endpoint(invest)]
