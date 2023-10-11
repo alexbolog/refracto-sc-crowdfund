@@ -59,4 +59,42 @@ impl LoanCfTestState {
             loan_duration,
         );
     }
+
+    pub fn create_default_mockup_in_state(&mut self, project_id: u64, state: &ProjectFundingState) {
+        self.create_mocked_project_explicit_proj_id(project_id);
+        self.whitelist_address(INVESTOR_1_ADDRESS_EXPR);
+
+        match state {
+            ProjectFundingState::Pending => {}
+            ProjectFundingState::Invalid => {}
+            ProjectFundingState::CFActive => {
+                self.set_block_timestamp(101);
+            }
+            ProjectFundingState::CFWaitingCooloff => {
+                self.set_block_timestamp(9999);
+                self.invest(INVESTOR_1_ADDRESS_EXPR, 9001, project_id);
+                self.set_block_timestamp(100001);
+            }
+            ProjectFundingState::CFSuccessful => {
+                self.set_block_timestamp(101);
+                self.invest(INVESTOR_1_ADDRESS_EXPR, 9001, project_id);
+                self.set_block_timestamp(100001);
+            }
+            ProjectFundingState::CFFailed => {
+                self.set_block_timestamp(100001);
+            }
+            ProjectFundingState::CFCancelled => {
+                self.cancel_project(project_id);
+            }
+            ProjectFundingState::LoanActive => {
+                self.set_block_timestamp(101);
+                self.invest(INVESTOR_1_ADDRESS_EXPR, 9001, project_id);
+                self.set_block_timestamp(100001);
+                self.claim_loan_funds(project_id);
+            }
+            ProjectFundingState::Completed => {
+                todo!();
+            }
+        }
+    }
 }
