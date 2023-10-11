@@ -30,9 +30,9 @@ use types::crowdfunding_state::CrowdfundingStateContext;
 
 use crate::{
     constants::{
-        COOL_OFF_PERIOD, ERR_CANNOT_INVEST_IN_CRT_STATE, ERR_CANNOT_WITHDRAW_IN_CRT_STATE,
-        ERR_COOL_OFF_EXPIRED, ERR_INVALID_PAYMENT_NONCE, ERR_INVALID_PAYMENT_TOKEN,
-        ERR_INVALID_PROJECT_ID, ERR_INVESTMENT_NOT_FOUND,
+        COOL_OFF_PERIOD, ERR_CANNOT_INVEST_IN_CRT_STATE, ERR_CANNOT_OVER_FINANCE,
+        ERR_CANNOT_WITHDRAW_IN_CRT_STATE, ERR_COOL_OFF_EXPIRED, ERR_INVALID_PAYMENT_NONCE,
+        ERR_INVALID_PAYMENT_TOKEN, ERR_INVALID_PROJECT_ID, ERR_INVESTMENT_NOT_FOUND,
     },
     types::crowdfunding_state::ProjectFundingState,
 };
@@ -67,7 +67,7 @@ pub trait LoanCrowdfundScContract:
         self.require_address_is_kyc_compliant(&caller);
 
         let mut cf_state = self.get_project_by_id_or_fail(project_id);
-        self.require_state_is_active(&cf_state);
+        self.require_can_invest_in_current_state(&cf_state);
         let payment = self.get_invest_payment_or_fail_if_invalid(&cf_state);
 
         let shares = self.get_loan_shares(&cf_state, &payment.amount);
@@ -183,7 +183,7 @@ pub trait LoanCrowdfundScContract:
                 }
             }
         }
-        
+
         require!(oldest_ts != u64::MAX, ERR_INVESTMENT_NOT_FOUND);
 
         oldest_recorded_payment
@@ -215,6 +215,11 @@ pub trait LoanCrowdfundScContract:
             ERR_INVALID_PAYMENT_TOKEN
         );
 
+        require!(
+            &payment.amount <= &(&cf_state.cf_target_max - &cf_state.cf_progress),
+            ERR_CANNOT_OVER_FINANCE
+        );
+
         payment
     }
 
@@ -229,7 +234,7 @@ pub trait LoanCrowdfundScContract:
         payment
     }
 
-    fn require_state_is_active(&self, cf_state: &CrowdfundingStateContext<Self::Api>) {
+    fn require_can_invest_in_current_state(&self, cf_state: &CrowdfundingStateContext<Self::Api>) {
         let state = cf_state.get_funding_state(
             &self.get_aggregated_cool_off_amount(cf_state.project_id),
             self.blockchain().get_block_timestamp(),
