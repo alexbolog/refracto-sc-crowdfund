@@ -44,7 +44,7 @@ pub mod common;
 pub mod constants;
 pub mod kyc;
 mod permissions;
-mod storage;
+pub mod storage;
 pub mod types;
 
 #[multiversx_sc::contract]
@@ -60,7 +60,7 @@ pub trait LoanCrowdfundScContract:
     #[init]
     fn init(&self, source_loan_repayment_sc_address: ManagedAddress) {
         self.source_loan_repayment_sc_address()
-            .set_if_empty(&source_loan_repayment_sc_address);
+            .set(&source_loan_repayment_sc_address);
     }
 
     #[payable("*")]
@@ -83,6 +83,11 @@ pub trait LoanCrowdfundScContract:
             payment.amount,
             self.blockchain().get_block_timestamp(),
         );
+    }
+
+    #[view(getDebugSourceRepaymentSc)]
+    fn get_source_repayment_sc(&self) -> ManagedAddress {
+        self.source_loan_repayment_sc_address().get()
     }
 
     #[payable("*")]

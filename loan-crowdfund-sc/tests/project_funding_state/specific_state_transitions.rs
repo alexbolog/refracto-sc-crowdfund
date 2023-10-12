@@ -23,4 +23,6 @@ fn funding_state_cool_off_to_failed() {
     state.set_block_timestamp(MOCKUP_CF_TIMESTAMP_AFTER_END);
 
     state.check_funding_state(1, ProjectFundingState::CFWaitingCooloff);
+
+    //TODO: finish this test
 }

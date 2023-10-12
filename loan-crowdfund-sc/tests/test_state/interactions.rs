@@ -1,6 +1,6 @@
 use loan_crowdfund_sc::{
     admin::ProxyTrait as _, beneficiary::ProxyTrait as _, constants::COOL_OFF_PERIOD,
-    kyc::ProxyTrait as _, ProxyTrait,
+    kyc::ProxyTrait as _, storage::config::ProxyTrait as _, ProxyTrait,
 };
 use multiversx_sc::{
     err_msg,
@@ -9,14 +9,18 @@ use multiversx_sc::{
 use multiversx_sc_scenario::{
     api::StaticApi,
     managed_address, managed_buffer, managed_token_id,
-    scenario_model::{Account, AddressValue, ScCallStep, ScDeployStep, SetStateStep, TxExpect},
+    scenario_model::{
+        Account, AddressValue, CheckStateStep, ScCallStep, ScDeployStep, ScQueryStep, SetStateStep,
+        TxExpect,
+    },
     ContractInfo, ScenarioWorld,
 };
 
 use super::{
-    world, LoanCfContract, LoanCfTestState, ACCOUNT_BALANCE_EXPR, BENEFICIARY_ADDRESS_EXPR,
-    INVALID_TOKEN_ID_EXPR, INVESTOR_1_ADDRESS_EXPR, INVESTOR_2_ADDRESS_EXPR, LOAN_CF_ADDRESS_EXPR,
-    LOAN_SHARES_ID, LOAN_SHARES_ID_EXPR, OWNER_ADDRESS_EXPR, USDC_TOKEN_ID_EXPR,
+    world, LoanCfContract, LoanCfTestState, LoanRepaymentContract, ACCOUNT_BALANCE_EXPR,
+    BENEFICIARY_ADDRESS_EXPR, INVALID_TOKEN_ID_EXPR, INVESTOR_1_ADDRESS_EXPR,
+    INVESTOR_2_ADDRESS_EXPR, LOAN_CF_ADDRESS_EXPR, LOAN_REPAYMENT_SC_ADDRESS_EXPR, LOAN_SHARES_ID,
+    LOAN_SHARES_ID_EXPR, OWNER_ADDRESS_EXPR, USDC_TOKEN_ID_EXPR,
 };
 
 impl LoanCfTestState {
@@ -26,6 +30,7 @@ impl LoanCfTestState {
             SetStateStep::new()
                 .put_account(OWNER_ADDRESS_EXPR, Account::new().nonce(1))
                 .new_address(OWNER_ADDRESS_EXPR, 1, LOAN_CF_ADDRESS_EXPR)
+                .new_address(OWNER_ADDRESS_EXPR, 1, LOAN_REPAYMENT_SC_ADDRESS_EXPR)
                 .put_account(
                     BENEFICIARY_ADDRESS_EXPR,
                     Account::new().nonce(1).balance(ACCOUNT_BALANCE_EXPR),
@@ -55,10 +60,12 @@ impl LoanCfTestState {
         let investor_address_2 = AddressValue::from(INVESTOR_2_ADDRESS_EXPR).to_address();
 
         let contract = LoanCfContract::new(LOAN_CF_ADDRESS_EXPR);
+        let repayment_contract_source = LoanRepaymentContract::new(LOAN_REPAYMENT_SC_ADDRESS_EXPR);
 
         Self {
             world,
             contract,
+            loan_repayment_sc: repayment_contract_source,
             admin_address: owner_address,
             beneficiary_address,
             investor_address_1,
@@ -67,12 +74,13 @@ impl LoanCfTestState {
     }
 
     pub fn deploy_contract(&mut self) -> &mut Self {
+        let address = AddressValue::from(LOAN_REPAYMENT_SC_ADDRESS_EXPR).to_address();
         let code = self.world.code_expression(LOAN_CF_ADDRESS_EXPR);
         self.world.sc_deploy(
             ScDeployStep::new()
                 .from(OWNER_ADDRESS_EXPR)
                 .code(code.clone())
-                .call(self.contract.init()),
+                .call(self.contract.init(managed_address!(&address))),
         );
 
         let mut acc = Account::new()
@@ -88,6 +96,12 @@ impl LoanCfTestState {
             b"loan_share_token_identifier".to_vec().into(),
             LOAN_SHARES_ID.as_bytes().into(),
         );
+
+        acc.storage.insert(
+            b"source_loan_repayment_sc_address".to_vec().into(),
+            address.as_bytes().into(),
+        );
+
         self.world.set_state_step(
             SetStateStep::new()
                 .new_token_identifier(LOAN_SHARES_ID_EXPR)
@@ -196,6 +210,14 @@ impl LoanCfTestState {
         cf_target_max: u64,
         loan_duration: u64,
     ) {
+        let new_repayment_sc_address: &str =
+            &("sc:loan_repayment_".to_string() + &project_id.to_string());
+        self.world.set_state_step(SetStateStep::new().new_address(
+            LOAN_CF_ADDRESS_EXPR,
+            0,
+            new_repayment_sc_address,
+        ));
+
         self.world
             .sc_call(ScCallStep::new().from(OWNER_ADDRESS_EXPR).call(
                 self.contract.create_project(
