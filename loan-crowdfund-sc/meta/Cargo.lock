@@ -810,6 +810,7 @@ checksum = "1a9bad9f94746442c783ca431b22403b519cd7fbeed0533fdd6328b2f2212128"
 name = "loan-crowdfund-sc"
 version = "0.0.0"
 dependencies = [
+ "loan-refund-escrow-sc",
  "multiversx-sc",
 ]
 
@@ -819,6 +820,13 @@ version = "0.0.0"
 dependencies = [
  "loan-crowdfund-sc",
  "multiversx-sc-meta",
+]
+
+[[package]]
+name = "loan-refund-escrow-sc"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc",
 ]
 
 [[package]]

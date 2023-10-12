@@ -88,6 +88,7 @@ fn failed_withdrawal_with_merged_investments() {
     state.whitelist_address(INVESTOR_1_ADDRESS_EXPR);
     state.set_block_timestamp(MOCKUP_CF_TIMESTAMP_AFTER_START);
     state.invest(INVESTOR_1_ADDRESS_EXPR, 1000, 1);
+    state.set_block_timestamp(MOCKUP_CF_TIMESTAMP_AFTER_START + 1);
     state.invest(INVESTOR_1_ADDRESS_EXPR, 1000, 1);
     state.set_block_timestamp(102);
 

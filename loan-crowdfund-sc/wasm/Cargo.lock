@@ -68,6 +68,7 @@ checksum = "7ebdb29d2ea9ed0083cd8cece49bbd968021bd99b0849edb4a9a7ee0fdf6a4e0"
 name = "loan-crowdfund-sc"
 version = "0.0.0"
 dependencies = [
+ "loan-refund-escrow-sc",
  "multiversx-sc",
 ]
 
@@ -77,6 +78,13 @@ version = "0.0.0"
 dependencies = [
  "loan-crowdfund-sc",
  "multiversx-sc-wasm-adapter",
+]
+
+[[package]]
+name = "loan-refund-escrow-sc"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc",
 ]
 
 [[package]]

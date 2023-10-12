@@ -119,7 +119,6 @@ pub trait AdminModule:
     fn deploy_escrow_sc(&self) -> ManagedAddress {
         let code_metadata = CodeMetadata::all();
         let source_address = self.source_loan_repayment_sc_address().get();
-
         let (new_address, _) = self.send_raw().deploy_from_source_contract(
             self.blockchain().get_gas_left() - 1_500_000,
             &BigUint::zero(),
