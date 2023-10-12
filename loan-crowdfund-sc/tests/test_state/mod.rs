@@ -21,8 +21,7 @@ pub const LOAN_SHARES_ID_EXPR: &str = "str:REFRACTO-123456";
 pub const LOAN_SHARES_ID: &str = "REFRACTO-123456";
 pub const INVALID_TOKEN_ID_EXPR: &str = "str:RANDOMTKN-123456";
 
-pub const LOAN_REPAYMENT_PATH_EXPR: &str =
-    "file:../loan-refund-escrow-sc/output/loan-refund-escrow-sc.wasm";
+pub const LOAN_REPAYMENT_PATH_EXPR: &str = "file:test_contracts/loan-refund-escrow-sc.wasm";
 
 pub mod bc_state_interactions;
 pub mod checks;
