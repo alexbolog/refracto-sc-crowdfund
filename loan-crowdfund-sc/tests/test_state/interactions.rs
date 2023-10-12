@@ -2,6 +2,7 @@ use loan_crowdfund_sc::{
     admin::ProxyTrait as _, beneficiary::ProxyTrait as _, constants::COOL_OFF_PERIOD,
     kyc::ProxyTrait as _, storage::config::ProxyTrait as _, ProxyTrait,
 };
+use loan_refund_escrow_sc::ProxyTrait as _;
 use multiversx_sc::{
     err_msg,
     types::{Address, TokenIdentifier},
@@ -19,8 +20,9 @@ use multiversx_sc_scenario::{
 use super::{
     world, LoanCfContract, LoanCfTestState, LoanRepaymentContract, ACCOUNT_BALANCE_EXPR,
     BENEFICIARY_ADDRESS_EXPR, INVALID_TOKEN_ID_EXPR, INVESTOR_1_ADDRESS_EXPR,
-    INVESTOR_2_ADDRESS_EXPR, LOAN_CF_ADDRESS_EXPR, LOAN_REPAYMENT_SC_ADDRESS_EXPR, LOAN_SHARES_ID,
-    LOAN_SHARES_ID_EXPR, OWNER_ADDRESS_EXPR, USDC_TOKEN_ID_EXPR,
+    INVESTOR_2_ADDRESS_EXPR, LOAN_CF_ADDRESS_EXPR, LOAN_REPAYMENT_PATH_EXPR,
+    LOAN_REPAYMENT_SC_ADDRESS_EXPR, LOAN_SHARES_ID, LOAN_SHARES_ID_EXPR, OWNER_ADDRESS_EXPR,
+    USDC_TOKEN_ID_EXPR,
 };
 
 impl LoanCfTestState {
@@ -30,7 +32,6 @@ impl LoanCfTestState {
             SetStateStep::new()
                 .put_account(OWNER_ADDRESS_EXPR, Account::new().nonce(1))
                 .new_address(OWNER_ADDRESS_EXPR, 1, LOAN_CF_ADDRESS_EXPR)
-                .new_address(OWNER_ADDRESS_EXPR, 1, LOAN_REPAYMENT_SC_ADDRESS_EXPR)
                 .put_account(
                     BENEFICIARY_ADDRESS_EXPR,
                     Account::new().nonce(1).balance(ACCOUNT_BALANCE_EXPR),
@@ -81,6 +82,23 @@ impl LoanCfTestState {
                 .from(OWNER_ADDRESS_EXPR)
                 .code(code.clone())
                 .call(self.contract.init(managed_address!(&address))),
+        );
+
+        self.world.set_state_step(SetStateStep::new().new_address(
+            OWNER_ADDRESS_EXPR,
+            2,
+            LOAN_REPAYMENT_SC_ADDRESS_EXPR,
+        ));
+
+        self.world.sc_deploy(
+            ScDeployStep::new()
+                .from(OWNER_ADDRESS_EXPR)
+                .code(self.world.code_expression(LOAN_REPAYMENT_PATH_EXPR))
+                .call(self.loan_repayment_sc.init(
+                    0u64,
+                    managed_address!(&Address::zero()),
+                    managed_token_id!("IGNORED-123456"),
+                )),
         );
 
         let mut acc = Account::new()
