@@ -30,7 +30,8 @@ pub trait AdminModule:
             "PROJECT ALREADY EXISTS"
         );
 
-        let escrow_sc_address = self.deploy_escrow_sc();
+        let escrow_sc_address =
+            self.deploy_escrow_sc(project_id, &developer_wallet, &project_payment_token);
 
         let share_token_nonce =
             self.mint_project_shares(&cf_target_max, &share_price_per_unit, &project_name);
@@ -116,15 +117,25 @@ pub trait AdminModule:
         }
     }
 
-    fn deploy_escrow_sc(&self) -> ManagedAddress {
+    fn deploy_escrow_sc(
+        &self,
+        project_id: u64,
+        developer_wallet: &ManagedAddress,
+        repayment_token_id: &TokenIdentifier,
+    ) -> ManagedAddress {
         let code_metadata = CodeMetadata::all();
         let source_address = self.source_loan_repayment_sc_address().get();
+        let mut args = ManagedArgBuffer::new();
+        args.push_arg(project_id);
+        args.push_arg(developer_wallet);
+        args.push_arg(repayment_token_id);
+
         let (new_address, _) = self.send_raw().deploy_from_source_contract(
             self.blockchain().get_gas_left() - 1_500_000,
             &BigUint::zero(),
             &source_address,
             code_metadata,
-            &ManagedArgBuffer::new(),
+            &args,
         );
 
         new_address
