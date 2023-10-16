@@ -79,12 +79,6 @@ pub trait AdminModule:
         self.process_payment_distribution(&mut cf_state, &BigUint::zero());
     }
 
-    #[only_owner]
-    #[endpoint(setTokenIdentifier)]
-    fn set_token_identifier(&self, token: TokenIdentifier) {
-        self.loan_share_token_identifier().set(token);
-    }
-
     #[payable("*")]
     #[only_owner]
     #[endpoint(issueAndSetRoles)]
