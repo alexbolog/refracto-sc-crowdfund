@@ -1,6 +1,7 @@
 use crate::{constants::COOL_OFF_PERIOD, types::crowdfunding_state::ProjectFundingState};
 
 multiversx_sc::imports!();
+use loan_refund_escrow_sc::ProxyTrait as _;
 
 #[multiversx_sc::module]
 pub trait CommonModule:
@@ -50,4 +51,10 @@ pub trait CommonModule:
 
         aggregated_cool_off_amount
     }
+
+    #[proxy]
+    fn repayment_sc_proxy(
+        &self,
+        sc_address: ManagedAddress,
+    ) -> loan_refund_escrow_sc::Proxy<Self::Api>;
 }
