@@ -5,3 +5,8 @@
 
 # The mxpy output
 /output*/
+
+# Scripts
+*/node_modules
+*/.env
+*/package-lock.json
