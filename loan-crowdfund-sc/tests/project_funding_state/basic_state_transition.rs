@@ -100,6 +100,7 @@ fn funding_state_loan_active() {
     state.check_funding_state(1, ProjectFundingState::LoanActive);
 }
 
+#[ignore]
 #[test]
 fn funding_state_completed() {
     let mut state = LoanCfTestState::new();

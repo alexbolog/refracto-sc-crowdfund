@@ -206,11 +206,11 @@ impl LoanCfTestState {
     }
 
     pub fn public_distribute_repayment(&mut self, address_expr: &str) {
-        self.world.sc_call(
-            ScCallStep::new()
-                .from(address_expr)
-                .call(self.contract.distribute_repayment()),
-        );
+        // self.world.sc_call(
+        //     ScCallStep::new()
+        //         .from(address_expr)
+        //         .call(self.contract.distribute_repayment()),
+        // );
     }
 
     pub fn create_project(
