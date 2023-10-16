@@ -12,3 +12,5 @@ pub const ERR_CANNOT_WITHDRAW_IN_CRT_STATE: &str = "Cannot withdraw in current f
 pub const ERR_REPAYMENT_DISTRIBUTED: &str = "Repayment already distributed";
 pub const ERR_TOKEN_ISSUED: &str = "Token already issued";
 pub const ERR_INSUFFICIENT_REPAYMENT_AMOUNT: &str = "Insufficient repayment amount";
+pub const ERR_CANNOT_CLAIM_IN_CRT_STATE: &str = "Cannot claim in current funding state";
+pub const ERR_NOTHING_TO_CLAIM: &str = "Nothing to claim";

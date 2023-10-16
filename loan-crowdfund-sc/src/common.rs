@@ -82,6 +82,33 @@ pub trait CommonModule:
         self.crowdfunding_state(cf_state.project_id).set(cf_state);
     }
 
+    fn mint_project_shares(
+        &self,
+        cf_max_target: &BigUint,
+        price_per_share: &BigUint,
+        project_name: &ManagedBuffer,
+    ) -> u64 {
+        let token = self.loan_share_token_identifier().get();
+        let amount = self.get_max_shares_supply(cf_max_target, price_per_share);
+        let nonce = self
+            .send()
+            .esdt_nft_create_compact_named(&token, &amount, project_name, b"");
+        nonce
+    }
+
+    fn get_max_shares_supply(&self, cf_max_target: &BigUint, price_per_share: &BigUint) -> BigUint {
+        cf_max_target / price_per_share
+    }
+
+    fn burn_project_shares(
+        &self,
+        token_identifier: &TokenIdentifier,
+        nonce: u64,
+        amount: &BigUint,
+    ) {
+        self.send().esdt_local_burn(token_identifier, nonce, amount);
+    }
+
     #[proxy]
     fn repayment_sc_proxy(
         &self,
