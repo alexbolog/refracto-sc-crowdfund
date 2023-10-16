@@ -1,0 +1,28 @@
+{
+  "address": {
+    "DEVNET": "erd1qqqqqqqqqqqqqpgqqua9nxjzvf39t6tuy55ak2ygk4luc3kf6pps2q3eyg"
+  },
+  "deploymentArgs": {
+    "gasLimit": 85000000,
+    "payable": true,
+    "payableBySc": true,
+    "DEVNET": [
+      {
+        "name": "project id dummy",
+        "type": "u64",
+        "value": 0
+      },
+      {
+        "name": "developer address dummy",
+        "type": "ManagedAddress",
+        "value": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      {
+        "name": "loan repayment token id dummy",
+        "type": "TokenIdentifier",
+        "value": "RANDOM-123456"
+      }
+    ],
+    "MAINNET": []
+  }
+}
