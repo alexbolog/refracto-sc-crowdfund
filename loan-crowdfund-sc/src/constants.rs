@@ -11,3 +11,4 @@ pub const ERR_INVESTMENT_NOT_FOUND: &str = "Investment not found";
 pub const ERR_CANNOT_WITHDRAW_IN_CRT_STATE: &str = "Cannot withdraw in current funding state";
 pub const ERR_REPAYMENT_DISTRIBUTED: &str = "Repayment already distributed";
 pub const ERR_TOKEN_ISSUED: &str = "Token already issued";
+pub const ERR_INSUFFICIENT_REPAYMENT_AMOUNT: &str = "Insufficient repayment amount";

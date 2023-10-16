@@ -1,8 +1,4 @@
-use crate::{
-    constants::{ERR_REPAYMENT_DISTRIBUTED, ERR_TOKEN_ISSUED},
-    types::crowdfunding_state::CrowdfundingStateContext,
-};
-use loan_refund_escrow_sc::ProxyTrait as _;
+use crate::{constants::ERR_TOKEN_ISSUED, types::crowdfunding_state::CrowdfundingStateContext};
 
 multiversx_sc::imports!();
 
@@ -79,21 +75,8 @@ pub trait AdminModule:
     #[endpoint(adminDistributeRepayment)]
     fn admin_distribute_repayments(&self, project_id: u64) {
         self.require_caller_is_admin();
-        require!(
-            self.repayment_rates(project_id).is_empty(),
-            ERR_REPAYMENT_DISTRIBUTED
-        );
-
         let mut cf_state = self.crowdfunding_state(project_id).get();
-        let repayment_amount: BigUint = self
-            .repayment_sc_proxy(cf_state.repayment_contract_address.clone())
-            .withdraw_repayment_funds()
-            .execute_on_dest_context();
-
-        let repayment_rate = cf_state.get_repayment_rate(&repayment_amount);
-        self.repayment_rates(project_id).set(&repayment_rate);
-        cf_state.is_repayed = true;
-        self.crowdfunding_state(project_id).set(cf_state);
+        self.process_payment_distribution(&mut cf_state, &BigUint::zero());
     }
 
     #[only_owner]

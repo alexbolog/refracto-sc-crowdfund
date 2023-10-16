@@ -124,7 +124,13 @@ pub trait LoanCrowdfundScContract:
     fn claim(&self) {}
 
     #[endpoint(distributeRepayment)]
-    fn distribute_repayment(&self) {}
+    fn distribute_repayment(&self, project_id: u64) {
+        let mut cf_state = self.crowdfunding_state(project_id).get();
+        let expected_total_repayment_amount =
+            cf_state.get_total_amount_due(self.blockchain().get_block_timestamp());
+
+        self.process_payment_distribution(&mut cf_state, &expected_total_repayment_amount);
+    }
 
     fn get_loan_shares(
         &self,
