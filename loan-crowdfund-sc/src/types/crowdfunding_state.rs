@@ -158,6 +158,10 @@ impl<M: ManagedTypeApi> CrowdfundingStateContext<M> {
 
         &self.cf_progress + &interest + &penalty
     }
+
+    pub fn get_repayment_rate(&self, repayment_amount: &BigUint<M>) -> BigUint<M> {
+        repayment_amount * INTEREST_RATE_DENOMINATION / &self.cf_progress
+    }
 }
 
 // Todo: impl getTotalSupply based on cf_progress and share_price_unit
