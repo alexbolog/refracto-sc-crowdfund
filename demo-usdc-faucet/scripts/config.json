@@ -1,0 +1,12 @@
+{
+  "address": {
+    "DEVNET": "erd1qqqqqqqqqqqqqpgq7p640kwtw22m9m9y0kwew0zvp8zh542z6ppsrqjaap"
+  },
+  "deploymentArgs": {
+    "gasLimit": 85000000,
+    "payable": false,
+    "payableBySc": true,
+    "DEVNET": [],
+    "MAINNET": []
+  }
+}
