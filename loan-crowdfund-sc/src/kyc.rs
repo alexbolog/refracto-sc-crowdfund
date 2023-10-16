@@ -15,7 +15,8 @@ pub trait KycModule: crate::permissions::PermissionsModule {
 
     #[endpoint(registerSuccessfulKyc)]
     fn register_successful_kyc(&self, address: ManagedAddress) {
-        self.require_address_is_admin(&self.blockchain().get_caller());
+        // TODO: uncomment this line after demo
+        // self.require_address_is_admin(&self.blockchain().get_caller());
         self.whitelisted_users().insert(address);
     }
 
