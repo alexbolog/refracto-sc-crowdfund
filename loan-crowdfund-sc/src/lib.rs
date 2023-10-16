@@ -30,9 +30,10 @@ use types::crowdfunding_state::CrowdfundingStateContext;
 
 use crate::{
     constants::{
-        COOL_OFF_PERIOD, ERR_CANNOT_INVEST_IN_CRT_STATE, ERR_CANNOT_OVER_FINANCE,
-        ERR_CANNOT_WITHDRAW_IN_CRT_STATE, ERR_COOL_OFF_EXPIRED, ERR_INVALID_PAYMENT_NONCE,
-        ERR_INVALID_PAYMENT_TOKEN, ERR_INVALID_PROJECT_ID, ERR_INVESTMENT_NOT_FOUND,
+        COOL_OFF_PERIOD, ERR_CANNOT_CLAIM_IN_CRT_STATE, ERR_CANNOT_INVEST_IN_CRT_STATE,
+        ERR_CANNOT_OVER_FINANCE, ERR_CANNOT_WITHDRAW_IN_CRT_STATE, ERR_COOL_OFF_EXPIRED,
+        ERR_INVALID_PAYMENT_NONCE, ERR_INVALID_PAYMENT_TOKEN, ERR_INVALID_PROJECT_ID,
+        ERR_INVESTMENT_NOT_FOUND, ERR_NOTHING_TO_CLAIM,
     },
     types::crowdfunding_state::ProjectFundingState,
 };
@@ -94,7 +95,7 @@ pub trait LoanCrowdfundScContract:
     #[endpoint(withdraw)]
     fn withdraw(&self) {
         let caller = self.blockchain().get_caller();
-        let payment = self.get_withdraw_payment_or_fail_if_invalid();
+        let payment = self.get_loan_share_payment_or_fail();
         let mut cf_state = self.get_project_by_nonce_or_fail(payment.token_nonce);
 
         let investment_amount = self.get_investment_amount_by_shares_amount(
@@ -120,8 +121,35 @@ pub trait LoanCrowdfundScContract:
         );
     }
 
+    #[payable("*")]
     #[endpoint(claim)]
-    fn claim(&self) {}
+    fn claim(&self) {
+        let payment = self.get_loan_share_payment_or_fail();
+        let cf_state = self.get_project_by_nonce_or_fail(payment.token_nonce);
+
+        self.require_can_claim_in_current_state(&cf_state);
+        let refund_amount = match cf_state.is_cancelled {
+            true => &payment.amount * &cf_state.share_price_per_unit,
+            false => match self.repayment_rates(cf_state.project_id).is_empty() {
+                true => BigUint::zero(),
+                false => self.repayment_rates(cf_state.project_id).get() * &payment.amount,
+            },
+        };
+
+        require!(&refund_amount > &0, ERR_NOTHING_TO_CLAIM);
+
+        self.burn_project_shares(
+            &payment.token_identifier,
+            payment.token_nonce,
+            &payment.amount,
+        );
+        self.send().direct_esdt(
+            &self.blockchain().get_caller(),
+            &cf_state.project_payment_token,
+            0,
+            &refund_amount,
+        );
+    }
 
     #[endpoint(distributeRepayment)]
     fn distribute_repayment(&self, project_id: u64) {
@@ -237,7 +265,7 @@ pub trait LoanCrowdfundScContract:
         payment
     }
 
-    fn get_withdraw_payment_or_fail_if_invalid(&self) -> EsdtTokenPayment {
+    fn get_loan_share_payment_or_fail(&self) -> EsdtTokenPayment {
         let payment = self.call_value().single_esdt();
 
         require!(
@@ -256,6 +284,18 @@ pub trait LoanCrowdfundScContract:
         require!(
             &state == &ProjectFundingState::CFActive,
             ERR_CANNOT_INVEST_IN_CRT_STATE
+        );
+    }
+
+    fn require_can_claim_in_current_state(&self, cf_state: &CrowdfundingStateContext<Self::Api>) {
+        let state = cf_state.get_funding_state(
+            &self.get_aggregated_cool_off_amount(cf_state.project_id),
+            self.blockchain().get_block_timestamp(),
+        );
+        require!(
+            &state == &ProjectFundingState::CFCancelled
+                || &state == &ProjectFundingState::Completed,
+            ERR_CANNOT_CLAIM_IN_CRT_STATE
         );
     }
 
