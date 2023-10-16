@@ -20,6 +20,7 @@ pub trait PermissionsModule {
         }
     }
 
+    #[view(getIsAddressAdmin)]
     fn is_address_admin(&self, address: &ManagedAddress) -> bool {
         self.admin_list().contains(address) || address == &self.blockchain().get_caller()
     }
