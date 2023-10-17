@@ -1,5 +1,6 @@
 #![no_std]
 
+use constants::ONE_SHARE_DENOMINATION;
 use types::crowdfunding_state::CrowdfundingStateContext;
 
 use crate::{
@@ -141,7 +142,8 @@ pub trait LoanCrowdfundScContract:
     ) -> EsdtTokenPayment {
         let share_token_id = self.loan_share_token_identifier().get();
         let nonce = state.share_token_nonce;
-        let shares_amount = invested_amount / &state.share_price_per_unit;
+        let shares_amount = &(invested_amount / &state.share_price_per_unit)
+            * &BigUint::from(ONE_SHARE_DENOMINATION);
 
         EsdtTokenPayment::new(share_token_id, nonce, shares_amount)
     }
