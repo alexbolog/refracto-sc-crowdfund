@@ -251,7 +251,6 @@ impl LoanCfTestState {
                     cf_target_min,
                     cf_target_max,
                     loan_duration,
-                    1u64,
                 ),
             ));
     }
