@@ -100,6 +100,24 @@ pub trait AdminModule:
             .call_and_exit()
     }
 
+    #[endpoint(setTransferRole)]
+    fn set_transfer_role(&self, address: OptionalValue<ManagedAddress>) {
+        self.require_caller_is_admin();
+        let address = match address {
+            OptionalValue::Some(address) => address,
+            OptionalValue::None => self.blockchain().get_sc_address(),
+        };
+        self.send()
+            .esdt_system_sc_proxy()
+            .set_special_roles(
+                &address,
+                &self.loan_share_token_identifier().get(),
+                [EsdtLocalRole::Transfer][..].iter().cloned(),
+            )
+            .async_call()
+            .call_and_exit();
+    }
+
     #[callback]
     fn issue_and_set_roles_callback(
         &self,
