@@ -5,7 +5,7 @@ multiversx_sc::derive_imports!();
 
 mod nft_module;
 
-const ONE_TOKEN_AMOUNT: u64 = 1_000_000_000_000_000_000;
+const ONE_TOKEN_AMOUNT: u64 = 1_000_000;
 const MINT_AMOUNT: u64 = 20_000;
 
 #[multiversx_sc::contract]

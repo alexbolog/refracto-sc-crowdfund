@@ -20,7 +20,7 @@ pub trait NftModule {
                 token_name,
                 token_ticker,
                 EsdtTokenType::Fungible,
-                18usize,
+                6usize,
             )
             .async_call()
             .with_callback(self.callbacks().issue_callback())
