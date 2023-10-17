@@ -24,7 +24,6 @@ pub trait AdminModule:
         cf_target_min: BigUint,
         cf_target_max: BigUint,
         loan_duration: u64,
-        loan_start_timestamp: u64,
     ) {
         self.require_caller_is_admin();
 
@@ -54,7 +53,6 @@ pub trait AdminModule:
             cf_target_min,
             cf_target_max,
             loan_duration,
-            loan_start_timestamp,
             escrow_sc_address,
         );
 
