@@ -1,9 +1,13 @@
-# DEMO status
-The smart contract has some core logic test coverage, more tests to be added later as we progress, but the implementation is 95%+ ready to be used.
+# X-Day 2023 Introduction
 
-The UI still needs some work, there'll be some features that will be mocked (or covered with a "Coming soon" message).
+## Codebase
+The Smart contract code base lies within this repository. There are automated tests for the core logic with more tests to come.
 
-The microservices/backend layer is work in progress, we only rely on the AWS lambda and public api/gateway at the moment.
+The Frontend of the application can be found here: https://github.com/alexbolog/refracto-app. There are some features that are not fully integrated with the smart contracts. They are covered with a "Coming soon" message.
+
+The microservices/backend layer can be found here: https://github.com/alexbolog/refracto-lambda. It is a work in progress, we only rely on the AWS lambda and public api/gateway at the moment.
+
+Please check out the demo branch, it has the latest changes.
 
 ## DEMO Steps
 First of all, you'll need a MultiversX wallet with some devnet EGLD on it.
