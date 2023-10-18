@@ -1,6 +1,8 @@
 # DEMO status
 The smart contract has some core logic test coverage, more tests to be added later as we progress, but the implementation is 95%+ ready to be used.
+
 The UI still needs some work, there'll be some features that will be mocked (or covered with a "Coming soon" message).
+
 The microservices/backend layer is work in progress, we only rely on the AWS lambda and public api/gateway at the moment.
 
 ## DEMO Steps
