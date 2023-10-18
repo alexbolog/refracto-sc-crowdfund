@@ -30,5 +30,5 @@ fn create_project_issues_expected_number_of_shares() {
     );
 
     let expected_shares = rust_biguint!(max_target) * rust_biguint!(ONE_SHARE_DENOMINATION);
-    state.check_address_share_balance(LOAN_CF_ADDRESS_EXPR, "1", &(expected_shares.to_string()));
+    state.check_address_share_balance(LOAN_CF_ADDRESS_EXPR, "1", &expected_shares.to_string());
 }

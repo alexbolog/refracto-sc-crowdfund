@@ -16,6 +16,7 @@ use multiversx_sc_scenario::{
     },
     ContractInfo, ScenarioWorld,
 };
+use num_bigint::BigUint;
 
 use super::{
     world, LoanCfContract, LoanCfTestState, LoanRepaymentContract, ACCOUNT_BALANCE_EXPR,
@@ -171,7 +172,7 @@ impl LoanCfTestState {
         );
     }
 
-    pub fn withdraw(&mut self, investor_address_expr: &str, nonce: u64, amount: u64) {
+    pub fn withdraw(&mut self, investor_address_expr: &str, nonce: u64, amount: &BigUint) {
         self.world.sc_call(
             ScCallStep::new()
                 .from(investor_address_expr)
@@ -184,7 +185,7 @@ impl LoanCfTestState {
         &mut self,
         investor_address_expr: &str,
         nonce: u64,
-        amount: u64,
+        amount: &BigUint,
         err_msg: &str,
     ) {
         self.world.sc_call(
