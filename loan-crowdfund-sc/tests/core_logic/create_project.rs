@@ -1,5 +1,7 @@
-use loan_crowdfund_sc::types::crowdfunding_state::INTEREST_RATE_DENOMINATION;
-use multiversx_sc_scenario::scenario_model::AddressValue;
+use loan_crowdfund_sc::{
+    constants::ONE_SHARE_DENOMINATION, types::crowdfunding_state::INTEREST_RATE_DENOMINATION,
+};
+use multiversx_sc_scenario::{rust_biguint, scenario_model::AddressValue};
 
 use crate::test_state::{
     LoanCfTestState, BENEFICIARY_ADDRESS_EXPR, LOAN_CF_ADDRESS_EXPR, USDC_TOKEN_ID,
@@ -27,5 +29,6 @@ fn create_project_issues_expected_number_of_shares() {
         1000,
     );
 
-    state.check_address_share_balance(LOAN_CF_ADDRESS_EXPR, "1", &(max_target.to_string()));
+    let expected_shares = rust_biguint!(max_target) * rust_biguint!(ONE_SHARE_DENOMINATION);
+    state.check_address_share_balance(LOAN_CF_ADDRESS_EXPR, "1", &expected_shares.to_string());
 }

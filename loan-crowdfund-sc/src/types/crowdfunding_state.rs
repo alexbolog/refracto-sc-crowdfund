@@ -3,7 +3,7 @@ multiversx_sc::derive_imports!();
 
 pub const INTEREST_RATE_DENOMINATION: u64 = 1_000_000_000;
 
-#[derive(TopEncode, TopDecode, TypeAbi)]
+#[derive(TopEncode, TopDecode, TypeAbi, ManagedVecItem, NestedDecode, NestedEncode)]
 pub struct CrowdfundingStateContext<M: ManagedTypeApi> {
     pub project_id: u64,
     pub project_name: ManagedBuffer<M>, // maybe?
@@ -47,7 +47,6 @@ impl<M: ManagedTypeApi> CrowdfundingStateContext<M> {
         cf_target_min: BigUint<M>,
         cf_target_max: BigUint<M>,
         loan_duration: u64,
-        loan_start_timestamp: u64,
         repayment_contract_address: ManagedAddress<M>,
     ) -> Self {
         CrowdfundingStateContext {
@@ -65,7 +64,7 @@ impl<M: ManagedTypeApi> CrowdfundingStateContext<M> {
             cf_target_max,
             cf_progress: BigUint::zero(),
             loan_duration,
-            loan_start_timestamp,
+            loan_start_timestamp: 0,
             repayment_contract_address,
             is_cancelled: false,
             is_loan_active: false,

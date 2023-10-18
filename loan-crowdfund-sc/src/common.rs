@@ -1,5 +1,8 @@
 use crate::{
-    constants::{COOL_OFF_PERIOD, ERR_INSUFFICIENT_REPAYMENT_AMOUNT, ERR_REPAYMENT_DISTRIBUTED},
+    constants::{
+        COOL_OFF_PERIOD, ERR_INSUFFICIENT_REPAYMENT_AMOUNT, ERR_REPAYMENT_DISTRIBUTED,
+        ONE_SHARE_DENOMINATION,
+    },
     types::crowdfunding_state::{CrowdfundingStateContext, ProjectFundingState},
 };
 
@@ -89,7 +92,8 @@ pub trait CommonModule:
         project_name: &ManagedBuffer,
     ) -> u64 {
         let token = self.loan_share_token_identifier().get();
-        let amount = self.get_max_shares_supply(cf_max_target, price_per_share);
+        let amount = &self.get_max_shares_supply(cf_max_target, price_per_share)
+            * &BigUint::from(ONE_SHARE_DENOMINATION);
         let nonce = self
             .send()
             .esdt_nft_create_compact_named(&token, &amount, project_name, b"");

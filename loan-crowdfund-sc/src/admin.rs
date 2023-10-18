@@ -24,7 +24,6 @@ pub trait AdminModule:
         cf_target_min: BigUint,
         cf_target_max: BigUint,
         loan_duration: u64,
-        loan_start_timestamp: u64,
     ) {
         self.require_caller_is_admin();
 
@@ -54,7 +53,6 @@ pub trait AdminModule:
             cf_target_min,
             cf_target_max,
             loan_duration,
-            loan_start_timestamp,
             escrow_sc_address,
         );
 
@@ -100,6 +98,24 @@ pub trait AdminModule:
             .async_call()
             .with_callback(self.callbacks().issue_and_set_roles_callback())
             .call_and_exit()
+    }
+
+    #[endpoint(setTransferRole)]
+    fn set_transfer_role(&self, address: OptionalValue<ManagedAddress>) {
+        self.require_caller_is_admin();
+        let address = match address {
+            OptionalValue::Some(address) => address,
+            OptionalValue::None => self.blockchain().get_sc_address(),
+        };
+        self.send()
+            .esdt_system_sc_proxy()
+            .set_special_roles(
+                &address,
+                &self.loan_share_token_identifier().get(),
+                [EsdtLocalRole::Transfer][..].iter().cloned(),
+            )
+            .async_call()
+            .call_and_exit();
     }
 
     #[callback]

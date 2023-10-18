@@ -1,6 +1,8 @@
 use loan_crowdfund_sc::constants::{
     ERR_CANNOT_WITHDRAW_IN_CRT_STATE, ERR_COOL_OFF_EXPIRED, ERR_INVESTMENT_NOT_FOUND,
+    ONE_SHARE_DENOMINATION,
 };
+use multiversx_sc_scenario::rust_biguint;
 
 use crate::test_state::{
     mockups::{MOCKUP_CF_TIMESTAMP_AFTER_END, MOCKUP_CF_TIMESTAMP_AFTER_START},
@@ -17,7 +19,8 @@ fn successful_cool_off_withdrawal() {
     state.invest(INVESTOR_1_ADDRESS_EXPR, 1000, 1);
     state.set_block_timestamp(102);
 
-    state.withdraw(INVESTOR_1_ADDRESS_EXPR, 1, 1000);
+    let all_shares = rust_biguint!(1000) * rust_biguint!(ONE_SHARE_DENOMINATION);
+    state.withdraw(INVESTOR_1_ADDRESS_EXPR, 1, &all_shares);
 
     state.check_address_share_balance(INVESTOR_1_ADDRESS_EXPR, "1", "0");
     state.check_address_usdc_balance(INVESTOR_1_ADDRESS_EXPR, ACCOUNT_BALANCE_EXPR);
@@ -35,8 +38,10 @@ fn successful_cool_off_withdrawal_with_multiple_investments() {
     state.invest(INVESTOR_1_ADDRESS_EXPR, 1000, 1);
     state.set_block_timestamp(103);
 
-    state.withdraw(INVESTOR_1_ADDRESS_EXPR, 1, 1000);
-    state.withdraw(INVESTOR_1_ADDRESS_EXPR, 1, 1000);
+    let all_shares = rust_biguint!(1000) * rust_biguint!(ONE_SHARE_DENOMINATION);
+
+    state.withdraw(INVESTOR_1_ADDRESS_EXPR, 1, &all_shares);
+    state.withdraw(INVESTOR_1_ADDRESS_EXPR, 1, &all_shares);
 
     state.check_address_share_balance(INVESTOR_1_ADDRESS_EXPR, "1", "0");
     state.check_address_usdc_balance(INVESTOR_1_ADDRESS_EXPR, ACCOUNT_BALANCE_EXPR);
@@ -56,8 +61,10 @@ fn successful_cool_off_withdrawal_with_investment_in_multiple_projects() {
     state.invest(INVESTOR_1_ADDRESS_EXPR, 1000, 2);
     state.set_block_timestamp(102);
 
-    state.withdraw(INVESTOR_1_ADDRESS_EXPR, 1, 1000);
-    state.withdraw(INVESTOR_1_ADDRESS_EXPR, 2, 1000);
+    let all_shares = rust_biguint!(1000) * rust_biguint!(ONE_SHARE_DENOMINATION);
+
+    state.withdraw(INVESTOR_1_ADDRESS_EXPR, 1, &all_shares);
+    state.withdraw(INVESTOR_1_ADDRESS_EXPR, 2, &all_shares);
 
     state.check_address_share_balance(INVESTOR_1_ADDRESS_EXPR, "1", "0");
     state.check_address_share_balance(INVESTOR_1_ADDRESS_EXPR, "2", "0");
@@ -74,10 +81,12 @@ fn failed_withdrawal_after_cool_off_state() {
     state.invest(INVESTOR_1_ADDRESS_EXPR, 1000, 1);
     state.set_block_timestamp(MOCKUP_CF_TIMESTAMP_AFTER_END);
 
+    let all_shares = rust_biguint!(1000) * rust_biguint!(ONE_SHARE_DENOMINATION);
+
     state.withdraw_and_expect_err(
         INVESTOR_1_ADDRESS_EXPR,
         1,
-        1000,
+        &all_shares,
         ERR_CANNOT_WITHDRAW_IN_CRT_STATE,
     );
 }
@@ -94,5 +103,12 @@ fn failed_withdrawal_with_merged_investments() {
     state.invest(INVESTOR_1_ADDRESS_EXPR, 1000, 1);
     state.set_block_timestamp(102);
 
-    state.withdraw_and_expect_err(INVESTOR_1_ADDRESS_EXPR, 1, 2000, ERR_INVESTMENT_NOT_FOUND);
+    let all_shares = rust_biguint!(2000) * rust_biguint!(ONE_SHARE_DENOMINATION);
+
+    state.withdraw_and_expect_err(
+        INVESTOR_1_ADDRESS_EXPR,
+        1,
+        &all_shares,
+        ERR_INVESTMENT_NOT_FOUND,
+    );
 }
