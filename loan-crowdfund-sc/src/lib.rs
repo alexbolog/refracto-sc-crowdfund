@@ -135,6 +135,22 @@ pub trait LoanCrowdfundScContract:
         self.process_payment_distribution(&mut cf_state, &expected_total_repayment_amount);
     }
 
+    #[view(getProjectDetails)]
+    fn get_project_details(
+        &self,
+        project_ids: MultiValueManagedVec<u64>,
+    ) -> ManagedVec<CrowdfundingStateContext<Self::Api>> {
+        let mut result = ManagedVec::new();
+        for project_id in project_ids.iter() {
+            if self.crowdfunding_state(project_id).is_empty() {
+                continue;
+            }
+            let cf_state = self.crowdfunding_state(project_id).get();
+            result.push(cf_state);
+        }
+        result
+    }
+
     fn get_loan_shares(
         &self,
         state: &CrowdfundingStateContext<Self::Api>,
@@ -179,7 +195,7 @@ pub trait LoanCrowdfundScContract:
         shares_amount: &BigUint,
         price_per_share: &BigUint,
     ) -> BigUint {
-        shares_amount * price_per_share
+        shares_amount * price_per_share / &BigUint::from(ONE_SHARE_DENOMINATION)
     }
 
     fn get_oldest_recorded_payment(

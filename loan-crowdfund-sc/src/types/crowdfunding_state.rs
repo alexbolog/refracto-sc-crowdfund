@@ -3,7 +3,7 @@ multiversx_sc::derive_imports!();
 
 pub const INTEREST_RATE_DENOMINATION: u64 = 1_000_000_000;
 
-#[derive(TopEncode, TopDecode, TypeAbi)]
+#[derive(TopEncode, TopDecode, TypeAbi, ManagedVecItem, NestedDecode, NestedEncode)]
 pub struct CrowdfundingStateContext<M: ManagedTypeApi> {
     pub project_id: u64,
     pub project_name: ManagedBuffer<M>, // maybe?
