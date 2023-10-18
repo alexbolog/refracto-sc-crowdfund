@@ -1,3 +1,25 @@
+# DEMO status
+The smart contract has some core logic test coverage, more tests to be added later as we progress, but the implementation is 95%+ ready to be used.
+The UI still needs some work, there'll be some features that will be mocked (or covered with a "Coming soon" message).
+The microservices/backend layer is work in progress, we only rely on the AWS lambda and public api/gateway at the moment.
+
+## DEMO Steps
+First of all, you'll need a MultiversX wallet with some devnet EGLD on it.
+Head over to https://devnet-wallet.multiversx.com to create your wallet and get some test tokens.
+
+- Go to https://mvp.refracto.io
+- Connect with a MultiversX wallet
+- Navigate to `profile` page
+- Click on `Mock Successful KYC` button and send the transaction. This will be replaced by a full KYC procedure in the future
+- Click on `Mint test USDC` which will yield you 20,000 RUSDC (Refracto devnet USDC - an USDC mockup for this phase)
+
+At this point, your wallet has a successful KYC and 20,000 spare test dollars.
+You can:
+- navigate existing projects and invest in them
+- see your account overview (which includes USDC balance, share balance, expected revenue and more) and portfolio
+- withdraw from one of your investments (to be fully compliant, each investor has a 14 days window of withdrawing his investment)
+
+
 # refracto-sc-crowdfund
 There are 3 contracts in this repo:
 - demo-usdc-faucet: an ESDT minter that allows anyone to mint tokens freely. Only used on devnet to supply an USDC mock
