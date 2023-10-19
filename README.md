@@ -3,7 +3,7 @@
 ## Codebase
 The Smart contract code base lies within this repository. There are automated tests for the core logic with more tests to come.
 
-The Frontend of the application can be found here: [https://github.com/alexbolog/refracto-app](https://github.com/alexbolog/refracto-app/tree/demo). There are some features that are not fully integrated with the smart contracts. They are covered with a "Coming soon" message.
+The Frontend of the application can be found here: [https://github.com/alexbolog/refracto-app/tree/demo](https://github.com/alexbolog/refracto-app/tree/demo). There are some features that are not fully integrated with the smart contracts. They are covered with a "Coming soon" message.
 Please check out the demo branch, it has the latest changes.
 
 The microservices/backend layer can be found here: https://github.com/alexbolog/refracto-lambda. It is a work in progress, we only rely on the AWS lambda and public api/gateway at the moment.
