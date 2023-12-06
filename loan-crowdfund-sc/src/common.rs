@@ -94,10 +94,9 @@ pub trait CommonModule:
         let token = self.loan_share_token_identifier().get();
         let amount = &self.get_max_shares_supply(cf_max_target, price_per_share)
             * &BigUint::from(ONE_SHARE_DENOMINATION);
-        let nonce = self
-            .send()
-            .esdt_nft_create_compact_named(&token, &amount, project_name, b"");
-        nonce
+
+        self.send()
+            .esdt_nft_create_compact_named(&token, &amount, project_name, b"")
     }
 
     fn get_max_shares_supply(&self, cf_max_target: &BigUint, price_per_share: &BigUint) -> BigUint {

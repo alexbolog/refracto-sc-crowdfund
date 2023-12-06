@@ -33,6 +33,7 @@ pub struct CrowdfundingStateContext<M: ManagedTypeApi> {
 }
 
 impl<M: ManagedTypeApi> CrowdfundingStateContext<M> {
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         project_id: u64,
         project_name: ManagedBuffer<M>,
@@ -93,14 +94,15 @@ impl<M: ManagedTypeApi> CrowdfundingStateContext<M> {
             return ProjectFundingState::Pending;
         }
 
-        if block_timestamp >= self.cf_start_timestamp && block_timestamp <= self.cf_end_timestamp {
-            if &self.cf_progress < &self.cf_target_min {
-                return ProjectFundingState::CFActive;
-            }
+        if block_timestamp >= self.cf_start_timestamp
+            && block_timestamp <= self.cf_end_timestamp
+            && self.cf_progress < self.cf_target_min
+        {
+            return ProjectFundingState::CFActive;
         }
 
         if block_timestamp > self.cf_end_timestamp {
-            if &self.cf_progress < &self.cf_target_min {
+            if self.cf_progress < self.cf_target_min {
                 return ProjectFundingState::CFFailed;
             } else if &self.cf_progress - amount_cooling_off >= self.cf_target_min {
                 return ProjectFundingState::CFSuccessful;
@@ -119,14 +121,11 @@ impl<M: ManagedTypeApi> CrowdfundingStateContext<M> {
 
         let days = (block_timestamp - self.loan_start_timestamp) / (24 * 3600);
 
-        let interest = self
-            .cf_progress
+        self.cf_progress
             .clone()
             .mul(self.daily_interest_rate)
             .mul(days)
-            .div(INTEREST_RATE_DENOMINATION);
-
-        interest
+            .div(INTEREST_RATE_DENOMINATION)
     }
 
     pub fn get_expected_loan_repayment_timestamp(&self) -> u64 {
@@ -141,14 +140,11 @@ impl<M: ManagedTypeApi> CrowdfundingStateContext<M> {
 
         let days = (block_timestamp - expected_loan_repayment_timestamp) / (24 * 3600);
 
-        let penalty = self
-            .cf_progress
+        self.cf_progress
             .clone()
             .mul(self.daily_penalty_fee_rate)
             .mul(days)
-            .div(INTEREST_RATE_DENOMINATION);
-
-        penalty
+            .div(INTEREST_RATE_DENOMINATION)
     }
 
     pub fn get_total_amount_due(&self, block_timestamp: u64) -> BigUint<M> {

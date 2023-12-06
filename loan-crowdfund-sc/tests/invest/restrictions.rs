@@ -25,7 +25,7 @@ fn investing_is_only_allowed_with_cf_active() {
     for funding_state in project_funding_states.iter() {
         let mut state = LoanCfTestState::new();
         state.deploy_contract();
-        state.create_default_mockup_in_state(1, &funding_state);
+        state.create_default_mockup_in_state(1, funding_state);
         state.check_funding_state(1, funding_state.clone());
         state.invest_and_expect_err(
             INVESTOR_1_ADDRESS_EXPR,

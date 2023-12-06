@@ -111,7 +111,7 @@ pub trait LoanCrowdfundScContract:
             },
         };
 
-        require!(&refund_amount > &0, ERR_NOTHING_TO_CLAIM);
+        require!(refund_amount > 0, ERR_NOTHING_TO_CLAIM);
 
         self.burn_project_shares(
             &payment.token_identifier,
@@ -245,12 +245,12 @@ pub trait LoanCrowdfundScContract:
         let payment = self.call_value().single_esdt();
 
         require!(
-            &payment.token_identifier == &cf_state.project_payment_token,
+            payment.token_identifier == cf_state.project_payment_token,
             ERR_INVALID_PAYMENT_TOKEN
         );
 
         require!(
-            &payment.amount <= &(&cf_state.cf_target_max - &cf_state.cf_progress),
+            payment.amount <= (&cf_state.cf_target_max - &cf_state.cf_progress),
             ERR_CANNOT_OVER_FINANCE
         );
 
@@ -261,7 +261,7 @@ pub trait LoanCrowdfundScContract:
         let payment = self.call_value().single_esdt();
 
         require!(
-            &payment.token_identifier == &self.loan_share_token_identifier().get(),
+            payment.token_identifier == self.loan_share_token_identifier().get(),
             ERR_INVALID_PAYMENT_TOKEN
         );
 
@@ -274,7 +274,7 @@ pub trait LoanCrowdfundScContract:
             self.blockchain().get_block_timestamp(),
         );
         require!(
-            &state == &ProjectFundingState::CFActive,
+            state == ProjectFundingState::CFActive,
             ERR_CANNOT_INVEST_IN_CRT_STATE
         );
     }
@@ -285,8 +285,8 @@ pub trait LoanCrowdfundScContract:
             self.blockchain().get_block_timestamp(),
         );
         require!(
-            &state == &ProjectFundingState::CFCancelled
-                || &state == &ProjectFundingState::Completed,
+            state == ProjectFundingState::CFCancelled
+                || state == ProjectFundingState::Completed,
             ERR_CANNOT_CLAIM_IN_CRT_STATE
         );
     }

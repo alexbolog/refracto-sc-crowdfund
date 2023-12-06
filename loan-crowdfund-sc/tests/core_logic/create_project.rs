@@ -1,6 +1,4 @@
-use loan_crowdfund_sc::{
-    constants::ONE_SHARE_DENOMINATION, types::crowdfunding_state::INTEREST_RATE_DENOMINATION,
-};
+use loan_crowdfund_sc::constants::ONE_SHARE_DENOMINATION;
 use multiversx_sc_scenario::{rust_biguint, scenario_model::AddressValue};
 
 use crate::test_state::{
