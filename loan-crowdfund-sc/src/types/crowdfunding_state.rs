@@ -173,7 +173,8 @@ pub enum ProjectFundingState {
     CFFailed = 5,
     CFCancelled = 6,
     LoanActive = 7,
-    Completed = 8,
+    LoanRepaymentRunningLate = 8,
+    Completed = 9
 }
 
 // claim:
