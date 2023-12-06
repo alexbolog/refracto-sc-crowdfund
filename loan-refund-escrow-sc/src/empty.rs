@@ -50,12 +50,15 @@ pub trait LoanRefundEscrowScContract {
     }
 
     fn require_address_is_developer_or_admin(&self, address: &ManagedAddress) {
+        let owner_address = self.blockchain().get_owner_address();
         let is_admin: bool = self
-            .cf_contract_proxy(self.blockchain().get_owner_address())
+            .cf_contract_proxy(owner_address.clone())
             .is_address_admin(address.clone())
             .execute_on_dest_context();
         require!(
-            is_admin || address == &self.developer_wallet_address().get(),
+            is_admin
+                || address == &owner_address
+                || address == &self.developer_wallet_address().get(),
             "Only project developer/admins can call this function"
         );
     }

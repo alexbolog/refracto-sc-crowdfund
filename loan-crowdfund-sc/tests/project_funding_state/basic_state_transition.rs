@@ -142,7 +142,7 @@ fn funding_state_completed() {
     state.claim_loan_funds(1);
     state.set_block_timestamp(MOCKUP_CF_TIMESTAMP_AFTER_END + MOCKUP_CF_DEFAULT_LOAN_DURATION + 1);
     state.repay_loan(&repayment_sc_address, 11000);
-    // state.admin_distribute_repayment(1);
+    state.admin_distribute_repayment(1);
 
-    // state.check_funding_state(1, ProjectFundingState::Completed);
+    state.check_funding_state(1, ProjectFundingState::Completed);
 }
