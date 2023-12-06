@@ -82,8 +82,12 @@ impl<M: ManagedTypeApi> CrowdfundingStateContext<M> {
             return ProjectFundingState::CFCancelled;
         }
 
-        if self.is_loan_active {
+        if self.is_loan_active && block_timestamp <= self.get_expected_loan_repayment_timestamp() {
             return ProjectFundingState::LoanActive;
+        }
+
+        if self.is_loan_active && block_timestamp > self.get_expected_loan_repayment_timestamp() {
+            return ProjectFundingState::LoanRepaymentRunningLate;
         }
 
         if self.is_repayed {
@@ -174,7 +178,7 @@ pub enum ProjectFundingState {
     CFCancelled = 6,
     LoanActive = 7,
     LoanRepaymentRunningLate = 8,
-    Completed = 9
+    Completed = 9,
 }
 
 // claim:
