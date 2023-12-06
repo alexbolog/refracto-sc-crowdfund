@@ -14,6 +14,8 @@ pub const MOCKUP_CF_DEFAULT_MIN_PRINCIPAL: u64 = 9000;
 pub const MOCKUP_CF_DEFAULT_MAX_PRINCIPAL: u64 = 10000;
 pub const MOCKUP_CF_DEFAULT_COVER_MIN_PRINCIPAL: u64 = 9001;
 
+pub const MOCKUP_CF_DEFAULT_LOAN_DURATION: u64 = 12 * 30 * 24 * 60 * 60; // one year
+
 impl LoanCfTestState {
     pub fn create_fully_mocked_project(&mut self) {
         self.create_mocked_project_explicit_proj_id(1);
@@ -26,7 +28,7 @@ impl LoanCfTestState {
             MOCKUP_CF_DEFAULT_MAX_PRINCIPAL,
             100,
             100,
-            12 * 30 * 24 * 60 * 60, // one year
+            MOCKUP_CF_DEFAULT_LOAN_DURATION,
         );
     }
 
