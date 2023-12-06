@@ -99,6 +99,9 @@ impl LoanCfTestState {
                 self.set_block_timestamp(MOCKUP_CF_TIMESTAMP_AFTER_END);
                 self.claim_loan_funds(project_id);
             }
+            ProjectFundingState::LoanRepaymentRunningLate => {
+                todo!()
+            }
             ProjectFundingState::Completed => {
                 todo!();
             }
