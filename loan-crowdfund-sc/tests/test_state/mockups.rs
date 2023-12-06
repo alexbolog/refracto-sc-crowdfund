@@ -17,11 +17,11 @@ pub const MOCKUP_CF_DEFAULT_COVER_MIN_PRINCIPAL: u64 = 9001;
 pub const MOCKUP_CF_DEFAULT_LOAN_DURATION: u64 = 12 * 30 * 24 * 60 * 60; // one year
 
 impl LoanCfTestState {
-    pub fn create_fully_mocked_project(&mut self) {
-        self.create_mocked_project_explicit_proj_id(1);
+    pub fn create_fully_mocked_project(&mut self) -> String {
+        self.create_mocked_project_explicit_proj_id(1)
     }
 
-    pub fn create_mocked_project_explicit_proj_id(&mut self, project_id: u64) {
+    pub fn create_mocked_project_explicit_proj_id(&mut self, project_id: u64) -> String {
         self.create_mocked_project_explicit_financing_details(
             project_id,
             MOCKUP_CF_DEFAULT_MIN_PRINCIPAL,
@@ -29,7 +29,7 @@ impl LoanCfTestState {
             100,
             100,
             MOCKUP_CF_DEFAULT_LOAN_DURATION,
-        );
+        )
     }
 
     pub fn create_mocked_project_explicit_financing_details(
@@ -40,7 +40,7 @@ impl LoanCfTestState {
         daily_interest_rate: u64,
         daily_penalty_fee: u64,
         loan_duration: u64,
-    ) {
+    ) -> String {
         self.create_project(
             project_id,
             "TEST PROJ",
@@ -54,7 +54,7 @@ impl LoanCfTestState {
             principal_min,
             principal_max,
             loan_duration,
-        );
+        )
     }
 
     pub fn create_default_mockup_in_state(&mut self, project_id: u64, state: &ProjectFundingState) {
