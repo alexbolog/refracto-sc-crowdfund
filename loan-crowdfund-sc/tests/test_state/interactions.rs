@@ -1,20 +1,12 @@
 use loan_crowdfund_sc::{
     admin::ProxyTrait as _, beneficiary::ProxyTrait as _, constants::COOL_OFF_PERIOD,
-    kyc::ProxyTrait as _, storage::config::ProxyTrait as _, ProxyTrait,
+    kyc::ProxyTrait as _, ProxyTrait,
 };
 use loan_refund_escrow_sc::ProxyTrait as _;
-use multiversx_sc::{
-    err_msg,
-    types::{Address, TokenIdentifier},
-};
+use multiversx_sc::types::Address;
 use multiversx_sc_scenario::{
-    api::StaticApi,
-    managed_address, managed_buffer, managed_token_id,
-    scenario_model::{
-        Account, AddressValue, CheckStateStep, ScCallStep, ScDeployStep, ScQueryStep, SetStateStep,
-        TxExpect,
-    },
-    ContractInfo, ScenarioWorld,
+    managed_address, managed_token_id,
+    scenario_model::{Account, AddressValue, ScCallStep, ScDeployStep, SetStateStep, TxExpect},
 };
 use num_bigint::BigUint;
 
@@ -26,6 +18,7 @@ use super::{
     USDC_TOKEN_ID_EXPR,
 };
 
+#[allow(dead_code)]
 impl LoanCfTestState {
     pub fn new() -> Self {
         let mut world = world();
@@ -206,7 +199,7 @@ impl LoanCfTestState {
         );
     }
 
-    pub fn public_distribute_repayment(&mut self, address_expr: &str) {
+    pub fn public_distribute_repayment(&mut self, _address_expr: &str) {
         // self.world.sc_call(
         //     ScCallStep::new()
         //         .from(address_expr)
@@ -214,6 +207,7 @@ impl LoanCfTestState {
         // );
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub fn create_project(
         &mut self,
         project_id: u64,
@@ -280,7 +274,7 @@ impl LoanCfTestState {
         );
     }
 
-    pub fn repay_loan(&mut self, project_id: u64, amount: u64) {
+    pub fn repay_loan(&mut self, _project_id: u64, _amount: u64) {
         // self.world.sc_call(
         //     ScCallStep::new()
         //         .from(BENEFICIARY_ADDRESS_EXPR)
