@@ -28,7 +28,11 @@ impl LoanCfTestState {
                 .new_address(OWNER_ADDRESS_EXPR, 1, LOAN_CF_ADDRESS_EXPR)
                 .put_account(
                     BENEFICIARY_ADDRESS_EXPR,
-                    Account::new().nonce(1).balance(ACCOUNT_BALANCE_EXPR),
+                    Account::new()
+                        .nonce(1)
+                        .balance(ACCOUNT_BALANCE_EXPR)
+                        .esdt_balance(USDC_TOKEN_ID_EXPR, ACCOUNT_BALANCE_EXPR)
+                        .esdt_balance(INVALID_TOKEN_ID_EXPR, ACCOUNT_BALANCE_EXPR),
                 )
                 .put_account(
                     INVESTOR_1_ADDRESS_EXPR,
@@ -222,7 +226,7 @@ impl LoanCfTestState {
         cf_target_min: u64,
         cf_target_max: u64,
         loan_duration: u64,
-    ) {
+    ) -> String {
         let new_repayment_sc_address: &str =
             &("sc:loan_repayment_".to_string() + &project_id.to_string());
         self.world.set_state_step(SetStateStep::new().new_address(
@@ -248,6 +252,8 @@ impl LoanCfTestState {
                     loan_duration,
                 ),
             ));
+
+        new_repayment_sc_address.to_owned()
     }
 
     pub fn cancel_project(&mut self, project_id: u64) {
@@ -274,13 +280,14 @@ impl LoanCfTestState {
         );
     }
 
-    pub fn repay_loan(&mut self, _project_id: u64, _amount: u64) {
-        // self.world.sc_call(
-        //     ScCallStep::new()
-        //         .from(BENEFICIARY_ADDRESS_EXPR)
-        //         .esdt_transfer(USDC_TOKEN_ID_EXPR, 0, amount)
-        //         .call(self.contract.repay_loan(project_id)),
-        // );
+    pub fn repay_loan(&mut self, address_expr: &str, amount: u64) {
+        let mut target_sc = LoanRepaymentContract::new(address_expr);
+        self.world.sc_call(
+            ScCallStep::new()
+                .from(BENEFICIARY_ADDRESS_EXPR)
+                .esdt_transfer(USDC_TOKEN_ID_EXPR, 0, amount)
+                .call(target_sc.deposit_loan_repayment()),
+        );
     }
 
     pub fn whitelist_address(&mut self, address_expr: &str) {
