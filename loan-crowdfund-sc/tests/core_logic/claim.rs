@@ -6,7 +6,7 @@ use crate::test_state::{
 };
 
 #[test]
-fn claim_rewards_yields_cancelled_project() {
+fn claim_rewards_cancelled_project() {
     let project_id = 1;
     let mut state = LoanCfTestState::new();
     state.deploy_contract();
@@ -22,7 +22,7 @@ fn claim_rewards_yields_cancelled_project() {
 }
 
 #[test]
-fn claim_rewards_yields_completed_project() {
+fn claim_rewards_completed_project() {
     let project_id = 1;
     let mut state = LoanCfTestState::new();
     state.deploy_contract();
