@@ -107,7 +107,10 @@ pub trait LoanCrowdfundScContract:
             true => &payment.amount * &cf_state.share_price_per_unit,
             false => match self.repayment_rates(cf_state.project_id).is_empty() {
                 true => BigUint::zero(),
-                false => self.repayment_rates(cf_state.project_id).get() * &payment.amount / INTEREST_RATE_DENOMINATION,
+                false => {
+                    self.repayment_rates(cf_state.project_id).get() * &payment.amount
+                        / INTEREST_RATE_DENOMINATION
+                }
             },
         };
 
@@ -269,9 +272,12 @@ pub trait LoanCrowdfundScContract:
     }
 
     fn require_can_invest_in_current_state(&self, cf_state: &CrowdfundingStateContext<Self::Api>) {
+        let repayment_sc_balance =
+            self.get_repayment_funds_balance(cf_state.repayment_contract_address.clone());
         let state = cf_state.get_funding_state(
             &self.get_aggregated_cool_off_amount(cf_state.project_id),
             self.blockchain().get_block_timestamp(),
+            &repayment_sc_balance,
         );
         require!(
             state == ProjectFundingState::CFActive,
@@ -280,13 +286,15 @@ pub trait LoanCrowdfundScContract:
     }
 
     fn require_can_claim_in_current_state(&self, cf_state: &CrowdfundingStateContext<Self::Api>) {
+        let repayment_sc_balance =
+            self.get_repayment_funds_balance(cf_state.repayment_contract_address.clone());
         let state = cf_state.get_funding_state(
             &self.get_aggregated_cool_off_amount(cf_state.project_id),
             self.blockchain().get_block_timestamp(),
+            &repayment_sc_balance,
         );
         require!(
-            state == ProjectFundingState::CFCancelled
-                || state == ProjectFundingState::Completed,
+            state == ProjectFundingState::CFCancelled || state == ProjectFundingState::Completed,
             ERR_CANNOT_CLAIM_IN_CRT_STATE
         );
     }
@@ -297,9 +305,12 @@ pub trait LoanCrowdfundScContract:
         investment_timestamp: u64,
     ) {
         let block_timestamp = self.blockchain().get_block_timestamp();
+        let repayment_sc_balance =
+            self.get_repayment_funds_balance(cf_state.repayment_contract_address.clone());
         let state = cf_state.get_funding_state(
             &self.get_aggregated_cool_off_amount(cf_state.project_id),
             block_timestamp,
+            &repayment_sc_balance,
         );
         require!(
             state == ProjectFundingState::CFActive

@@ -116,6 +116,20 @@ impl LoanCfTestState {
             ProjectFundingState::LoanRepaymentRunningLate => {
                 todo!()
             }
+            ProjectFundingState::LoanRepaidNotComplete => {
+                self.set_block_timestamp(MOCKUP_CF_TIMESTAMP_AFTER_START);
+                self.invest(
+                    INVESTOR_1_ADDRESS_EXPR,
+                    MOCKUP_CF_DEFAULT_COVER_MIN_PRINCIPAL,
+                    1,
+                );
+                self.set_block_timestamp(MOCKUP_CF_TIMESTAMP_AFTER_END);
+                self.claim_loan_funds(project_id);
+                self.set_block_timestamp(
+                    MOCKUP_CF_TIMESTAMP_AFTER_END + MOCKUP_CF_DEFAULT_LOAN_DURATION + 1,
+                );
+                self.repay_loan(&repayment_sc_address, MOCKUP_CF_DEFAULT_COVER_MIN_REPAYMENT);
+            }
             ProjectFundingState::Completed => {
                 self.set_block_timestamp(MOCKUP_CF_TIMESTAMP_AFTER_START);
                 self.invest(

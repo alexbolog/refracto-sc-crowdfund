@@ -63,6 +63,13 @@ pub trait LoanRefundEscrowScContract {
         );
     }
 
+    #[view(getRepaymentFundsBalance)]
+    fn get_repayment_funds_balance(&self) -> BigUint {
+        let token_id = self.loan_repayment_token_id().get();
+        self.blockchain()
+            .get_sc_balance(&EgldOrEsdtTokenIdentifier::esdt(token_id), 0)
+    }
+
     #[proxy]
     fn cf_contract_proxy(&self, sc_address: ManagedAddress)
         -> crowdfund_sc_proxy::Proxy<Self::Api>;

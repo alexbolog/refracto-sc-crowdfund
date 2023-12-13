@@ -77,6 +77,7 @@ impl<M: ManagedTypeApi> CrowdfundingStateContext<M> {
         &self,
         amount_cooling_off: &BigUint<M>,
         block_timestamp: u64,
+        _repayment_sc_balance: &BigUint<M>,
     ) -> ProjectFundingState {
         if self.is_cancelled {
             return ProjectFundingState::CFCancelled;
@@ -181,7 +182,8 @@ pub enum ProjectFundingState {
     CFCancelled = 6,
     LoanActive = 7,
     LoanRepaymentRunningLate = 8,
-    Completed = 9,
+    LoanRepaidNotComplete = 9,
+    Completed = 10,
 }
 
 // claim:

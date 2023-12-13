@@ -43,9 +43,14 @@ pub trait CommonModule:
             return ProjectFundingState::Invalid;
         }
 
-        self.crowdfunding_state(project_id).get().get_funding_state(
+        let cf_state = self.crowdfunding_state(project_id).get();
+        let repayment_sc_balance =
+            self.get_repayment_funds_balance(cf_state.repayment_contract_address.clone());
+
+        cf_state.get_funding_state(
             &self.get_aggregated_cool_off_amount(project_id),
             self.blockchain().get_block_timestamp(),
+            &repayment_sc_balance,
         )
     }
 
@@ -94,6 +99,12 @@ pub trait CommonModule:
             .set(&repayment_rate);
         cf_state.is_repayed = true;
         self.crowdfunding_state(cf_state.project_id).set(cf_state);
+    }
+
+    fn get_repayment_funds_balance(&self, sc_address: ManagedAddress) -> BigUint {
+        self.repayment_sc_proxy(sc_address)
+            .get_repayment_funds_balance()
+            .execute_on_dest_context()
     }
 
     fn mint_project_shares(
