@@ -105,6 +105,7 @@ impl LoanCfTestState {
                 vec![
                     "ESDTRoleNFTCreate".to_string(),
                     "ESDTRoleNFTAddQuantity".to_string(),
+                    "ESDTRoleNFTBurn".to_string()
                 ],
             )
             .code(code);

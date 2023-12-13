@@ -10,7 +10,7 @@ use crate::{
         ERR_INVALID_PAYMENT_NONCE, ERR_INVALID_PAYMENT_TOKEN, ERR_INVALID_PROJECT_ID,
         ERR_INVESTMENT_NOT_FOUND, ERR_NOTHING_TO_CLAIM,
     },
-    types::crowdfunding_state::ProjectFundingState,
+    types::crowdfunding_state::{ProjectFundingState, INTEREST_RATE_DENOMINATION},
 };
 
 multiversx_sc::imports!();
@@ -107,7 +107,7 @@ pub trait LoanCrowdfundScContract:
             true => &payment.amount * &cf_state.share_price_per_unit,
             false => match self.repayment_rates(cf_state.project_id).is_empty() {
                 true => BigUint::zero(),
-                false => self.repayment_rates(cf_state.project_id).get() * &payment.amount,
+                false => self.repayment_rates(cf_state.project_id).get() * &payment.amount / INTEREST_RATE_DENOMINATION,
             },
         };
 
