@@ -35,6 +35,8 @@ const loadNetworkConfig = () => {
   const api = process.env[`NETWORKS_${workingEnv}_API`];
   const pem = process.env[`PEM_${workingEnv}`];
 
+  console.log("ENV", workingEnv, chainId, gateway, api, pem);
+
   return {
     chain: chainId,
     gateway,

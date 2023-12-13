@@ -26,7 +26,7 @@ const issueToken = async (contract) => {
   const interaction = contract.methods
     .issueAndSetRoles([tokenDisplayName, tokenTicker])
     .withValue(new BigNumber(0.05).shiftedBy(18))
-    .withGasLimit(60_000_000);
+    .withGasLimit(100_000_000);
   await signAndSendTx(interaction);
 };
 
