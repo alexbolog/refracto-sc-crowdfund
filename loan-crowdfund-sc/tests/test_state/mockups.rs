@@ -14,6 +14,7 @@ pub const MOCKUP_CF_DEFAULT_MIN_PRINCIPAL: u64 = 9000;
 pub const MOCKUP_CF_DEFAULT_MAX_PRINCIPAL: u64 = 10000;
 pub const MOCKUP_CF_DEFAULT_COVER_MIN_PRINCIPAL: u64 = 9000;
 pub const MOCKUP_CF_DEFAULT_COVER_MIN_REPAYMENT: u64 = 9000 * 120 / 100;
+pub const MOCKUP_CF_SMALL_INVESTMENT: u64 = MOCKUP_CF_DEFAULT_MIN_PRINCIPAL / 10;
 
 pub const MOCKUP_CF_DEFAULT_LOAN_DURATION: u64 = 12 * 30 * 24 * 60 * 60; // one year
 
@@ -94,6 +95,12 @@ impl LoanCfTestState {
                 self.set_block_timestamp(MOCKUP_CF_TIMESTAMP_AFTER_END);
             }
             ProjectFundingState::CFCancelled => {
+                self.set_block_timestamp(MOCKUP_CF_TIMESTAMP_AFTER_START);
+                self.invest(
+                    INVESTOR_1_ADDRESS_EXPR,
+                    MOCKUP_CF_SMALL_INVESTMENT,
+                    project_id,
+                );
                 self.cancel_project(project_id);
             }
             ProjectFundingState::LoanActive => {
