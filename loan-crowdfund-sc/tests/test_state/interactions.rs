@@ -212,6 +212,20 @@ impl LoanCfTestState {
         );
     }
 
+    pub fn public_distribute_repayment_and_expect_err(
+        &mut self,
+        address_expr: &str,
+        project_id: u64,
+        err_msg: &str,
+    ) {
+        self.world.sc_call(
+            ScCallStep::new()
+                .from(address_expr)
+                .call(self.contract.distribute_repayment(project_id))
+                .expect(TxExpect::err(4, "str:".to_string() + err_msg)),
+        );
+    }
+
     #[allow(clippy::too_many_arguments)]
     pub fn create_project(
         &mut self,
