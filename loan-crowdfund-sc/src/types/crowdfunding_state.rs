@@ -179,10 +179,6 @@ impl<M: ManagedTypeApi> CrowdfundingStateContext<M> {
     }
 }
 
-// Todo: impl getTotalSupply based on cf_progress and share_price_unit
-
-// user -> trimite bani la escrow -> escrow cumpara shares ca proxy
-// bot -> call escrow to release shares to user
 #[derive(TopEncode, TopDecode, TypeAbi, NestedDecode, NestedEncode, PartialEq, Eq, Clone)]
 pub enum ProjectFundingState {
     Invalid = 0,
@@ -197,11 +193,3 @@ pub enum ProjectFundingState {
     LoanRepaidNotComplete = 9,
     Completed = 10,
 }
-
-// claim:
-// claim repayment + interest
-// claim funds back (if CF failed or cancelled)
-
-// 2 phases:
-// - crowdfunding
-// - loan repayment

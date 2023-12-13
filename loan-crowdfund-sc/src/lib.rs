@@ -19,6 +19,7 @@ pub mod admin;
 pub mod beneficiary;
 pub mod common;
 pub mod constants;
+pub mod interactors;
 pub mod kyc;
 mod permissions;
 pub mod storage;
@@ -33,6 +34,7 @@ pub trait LoanCrowdfundScContract:
     + admin::AdminModule
     + beneficiary::BeneficiaryModule
     + common::CommonModule
+    + interactors::loan_repayment_sc_interactor::LoanRepaymentScInteractor
 {
     #[init]
     fn init(&self, source_loan_repayment_sc_address: ManagedAddress) {
