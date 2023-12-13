@@ -5,12 +5,13 @@ use types::crowdfunding_state::CrowdfundingStateContext;
 
 use crate::{
     constants::{
+        CF_STATES_ALLOWING_CLAIMING, CF_STATES_ALLOWING_INVESTMENT, CF_STATES_ALLOWING_WITHDRAWAL,
         COOL_OFF_PERIOD, ERR_CANNOT_CLAIM_IN_CRT_STATE, ERR_CANNOT_INVEST_IN_CRT_STATE,
         ERR_CANNOT_OVER_FINANCE, ERR_CANNOT_WITHDRAW_IN_CRT_STATE, ERR_COOL_OFF_EXPIRED,
         ERR_INVALID_PAYMENT_NONCE, ERR_INVALID_PAYMENT_TOKEN, ERR_INVALID_PROJECT_ID,
         ERR_INVESTMENT_NOT_FOUND, ERR_NOTHING_TO_CLAIM,
     },
-    types::crowdfunding_state::{ProjectFundingState, INTEREST_RATE_DENOMINATION},
+    types::crowdfunding_state::INTEREST_RATE_DENOMINATION,
 };
 
 multiversx_sc::imports!();
@@ -280,7 +281,7 @@ pub trait LoanCrowdfundScContract:
             &repayment_sc_balance,
         );
         require!(
-            state == ProjectFundingState::CFActive,
+            CF_STATES_ALLOWING_INVESTMENT.contains(&state),
             ERR_CANNOT_INVEST_IN_CRT_STATE
         );
     }
@@ -294,7 +295,7 @@ pub trait LoanCrowdfundScContract:
             &repayment_sc_balance,
         );
         require!(
-            state == ProjectFundingState::CFCancelled || state == ProjectFundingState::Completed,
+            CF_STATES_ALLOWING_CLAIMING.contains(&state),
             ERR_CANNOT_CLAIM_IN_CRT_STATE
         );
     }
@@ -313,8 +314,7 @@ pub trait LoanCrowdfundScContract:
             &repayment_sc_balance,
         );
         require!(
-            state == ProjectFundingState::CFActive
-                || state == ProjectFundingState::CFWaitingCooloff,
+            CF_STATES_ALLOWING_WITHDRAWAL.contains(&state),
             ERR_CANNOT_WITHDRAW_IN_CRT_STATE
         );
         require!(
