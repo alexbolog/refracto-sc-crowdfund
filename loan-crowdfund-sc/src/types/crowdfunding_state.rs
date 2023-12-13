@@ -6,10 +6,10 @@ pub const INTEREST_RATE_DENOMINATION: u64 = 1_000_000_000;
 #[derive(TopEncode, TopDecode, TypeAbi, ManagedVecItem, NestedDecode, NestedEncode)]
 pub struct CrowdfundingStateContext<M: ManagedTypeApi> {
     pub project_id: u64,
-    pub project_name: ManagedBuffer<M>, // maybe?
+    pub project_name: ManagedBuffer<M>, // good to easier identify what's going on
     pub project_payment_token: TokenIdentifier<M>,
 
-    pub daily_interest_rate: u64, // dobanda zilnica
+    pub daily_interest_rate: u64,
     pub daily_penalty_fee_rate: u64,
     pub developer_wallet: ManagedAddress<M>,
 
