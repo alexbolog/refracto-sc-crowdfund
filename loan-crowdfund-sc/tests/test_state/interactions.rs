@@ -105,7 +105,7 @@ impl LoanCfTestState {
                 vec![
                     "ESDTRoleNFTCreate".to_string(),
                     "ESDTRoleNFTAddQuantity".to_string(),
-                    "ESDTRoleNFTBurn".to_string()
+                    "ESDTRoleNFTBurn".to_string(),
                 ],
             )
             .code(code);
@@ -204,12 +204,12 @@ impl LoanCfTestState {
         );
     }
 
-    pub fn public_distribute_repayment(&mut self, _address_expr: &str) {
-        // self.world.sc_call(
-        //     ScCallStep::new()
-        //         .from(address_expr)
-        //         .call(self.contract.distribute_repayment()),
-        // );
+    pub fn public_distribute_repayment(&mut self, address_expr: &str, project_id: u64) {
+        self.world.sc_call(
+            ScCallStep::new()
+                .from(address_expr)
+                .call(self.contract.distribute_repayment(project_id)),
+        );
     }
 
     #[allow(clippy::too_many_arguments)]

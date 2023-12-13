@@ -31,3 +31,11 @@ fn repayment_rate_computed_correctly() {
         / MOCKUP_CF_DEFAULT_COVER_MIN_PRINCIPAL;
     state.check_repayment_rate(project_id, expected_repayment_rate);
 }
+
+#[test]
+fn public_distribute_repayment() {
+    let project_id = 1;
+    let mut state = LoanCfTestState::new();
+    state.deploy_contract();
+    state.create_default_mockup_in_state(project_id, &ProjectFundingState::Completed);
+}
