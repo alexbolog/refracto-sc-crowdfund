@@ -147,6 +147,8 @@ impl LoanCfTestState {
             }
         }
 
+        self.check_funding_state(project_id, state.clone());
+
         repayment_sc_address
     }
 }
