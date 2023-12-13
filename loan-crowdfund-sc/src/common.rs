@@ -28,6 +28,12 @@ pub trait CommonModule:
     #[view(getTotalAmount)]
     fn get_total_amount(&self, project_id: u64) -> BigUint {
         let state = self.crowdfunding_state(project_id).get();
+        if state.is_repayed {
+            let repayment_rate = self.repayment_rates(project_id).get();
+
+            return state.get_repaid_amount(&repayment_rate);
+        }
+
         state.get_total_amount_due(self.blockchain().get_block_timestamp())
     }
 
@@ -56,6 +62,11 @@ pub trait CommonModule:
         }
 
         aggregated_cool_off_amount
+    }
+
+    #[view(getRepaymentRate)]
+    fn get_repayment_rate(&self, project_id: u64) -> BigUint {
+        self.repayment_rates(project_id).get()
     }
 
     fn process_payment_distribution(
