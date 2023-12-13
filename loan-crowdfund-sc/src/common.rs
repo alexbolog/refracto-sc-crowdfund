@@ -1,3 +1,4 @@
+multiversx_sc::imports!();
 use crate::{
     constants::{
         COOL_OFF_PERIOD, ERR_INSUFFICIENT_REPAYMENT_AMOUNT, ERR_REPAYMENT_DISTRIBUTED,
@@ -6,12 +7,11 @@ use crate::{
     types::crowdfunding_state::{CrowdfundingStateContext, ProjectFundingState},
 };
 
-multiversx_sc::imports!();
-use loan_refund_escrow_sc::ProxyTrait as _;
-
 #[multiversx_sc::module]
 pub trait CommonModule:
-    crate::storage::config::ConfigModule + crate::storage::payments::PaymentsModule
+    crate::storage::config::ConfigModule
+    + crate::storage::payments::PaymentsModule
+    + crate::interactors::loan_repayment_sc_interactor::LoanRepaymentScInteractor
 {
     #[view(getExpectedInterest)]
     fn get_expected_interest(&self, project_id: u64) -> BigUint {
@@ -83,11 +83,8 @@ pub trait CommonModule:
             self.repayment_rates(cf_state.project_id).is_empty(),
             ERR_REPAYMENT_DISTRIBUTED
         );
-
-        let repayment_amount: BigUint = self
-            .repayment_sc_proxy(cf_state.repayment_contract_address.clone())
-            .withdraw_repayment_funds()
-            .execute_on_dest_context();
+        let repayment_amount: BigUint =
+            self.withdraw_repayment_funds(cf_state.repayment_contract_address.clone());
 
         require!(
             min_allowed_amount <= &repayment_amount,
@@ -99,12 +96,6 @@ pub trait CommonModule:
             .set(&repayment_rate);
         cf_state.is_repayed = true;
         self.crowdfunding_state(cf_state.project_id).set(cf_state);
-    }
-
-    fn get_repayment_funds_balance(&self, sc_address: ManagedAddress) -> BigUint {
-        self.repayment_sc_proxy(sc_address)
-            .get_repayment_funds_balance()
-            .execute_on_dest_context()
     }
 
     fn mint_project_shares(
@@ -133,10 +124,4 @@ pub trait CommonModule:
     ) {
         self.send().esdt_local_burn(token_identifier, nonce, amount);
     }
-
-    #[proxy]
-    fn repayment_sc_proxy(
-        &self,
-        sc_address: ManagedAddress,
-    ) -> loan_refund_escrow_sc::Proxy<Self::Api>;
 }
