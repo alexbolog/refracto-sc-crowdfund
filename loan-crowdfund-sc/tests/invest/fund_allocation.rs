@@ -20,8 +20,7 @@ fn invest_yields_correct_number_of_shares() {
         &expected_share_balance.to_string(),
     );
 }
-//TODO: fix multiple projects being deployed in test env
-#[ignore]
+
 #[test]
 fn invest_yields_correct_share_nonce() {
     let mut state = LoanCfTestState::new();

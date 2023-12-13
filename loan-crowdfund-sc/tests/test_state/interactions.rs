@@ -232,7 +232,7 @@ impl LoanCfTestState {
             &("sc:loan_repayment_".to_string() + &project_id.to_string());
         self.world.set_state_step(SetStateStep::new().new_address(
             LOAN_CF_ADDRESS_EXPR,
-            0,
+            project_id - 1,
             new_repayment_sc_address,
         ));
 
