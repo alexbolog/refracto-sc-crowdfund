@@ -77,7 +77,7 @@ impl<M: ManagedTypeApi> CrowdfundingStateContext<M> {
         &self,
         amount_cooling_off: &BigUint<M>,
         block_timestamp: u64,
-        _repayment_sc_balance: &BigUint<M>,
+        repayment_sc_balance: &BigUint<M>,
     ) -> ProjectFundingState {
         if self.is_cancelled {
             return ProjectFundingState::CFCancelled;
@@ -86,12 +86,24 @@ impl<M: ManagedTypeApi> CrowdfundingStateContext<M> {
             return ProjectFundingState::Completed;
         }
 
-        if self.is_loan_active && block_timestamp <= self.get_expected_loan_repayment_timestamp() {
+        let loan_repayment_deadline_timestamp = self.get_expected_loan_repayment_timestamp();
+
+        if self.is_loan_active && block_timestamp <= loan_repayment_deadline_timestamp {
             return ProjectFundingState::LoanActive;
         }
 
-        if self.is_loan_active && block_timestamp > self.get_expected_loan_repayment_timestamp() {
+        if self.is_loan_active
+            && block_timestamp > loan_repayment_deadline_timestamp
+            && repayment_sc_balance == &0
+        {
             return ProjectFundingState::LoanRepaymentRunningLate;
+        }
+
+        if self.is_loan_active
+            && block_timestamp > loan_repayment_deadline_timestamp
+            && repayment_sc_balance > &0
+        {
+            return ProjectFundingState::LoanRepaidNotComplete;
         }
 
         if block_timestamp < self.cf_start_timestamp {
