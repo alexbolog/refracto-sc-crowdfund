@@ -1,5 +1,6 @@
 mod apr_distribution;
-mod repayments;
+mod claim;
 mod create_project;
 mod interest_and_fees_calc;
 mod investment;
+mod repayments;
