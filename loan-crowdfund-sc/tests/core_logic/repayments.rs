@@ -4,7 +4,7 @@ use loan_crowdfund_sc::types::crowdfunding_state::{
 
 use crate::test_state::{
     mockups::{MOCKUP_CF_DEFAULT_COVER_MIN_PRINCIPAL, MOCKUP_CF_DEFAULT_COVER_MIN_REPAYMENT},
-    LoanCfTestState,
+    LoanCfTestState, INVESTOR_1_ADDRESS_EXPR,
 };
 
 #[test]
@@ -37,5 +37,11 @@ fn public_distribute_repayment() {
     let project_id = 1;
     let mut state = LoanCfTestState::new();
     state.deploy_contract();
-    state.create_default_mockup_in_state(project_id, &ProjectFundingState::Completed);
+    state.create_default_mockup_in_state(project_id, &ProjectFundingState::LoanRepaidNotComplete);
+
+    state.check_funding_state(project_id, ProjectFundingState::LoanRepaidNotComplete);
+
+    state.public_distribute_repayment(INVESTOR_1_ADDRESS_EXPR, project_id);
+
+    state.check_funding_state(project_id, ProjectFundingState::Completed);
 }
