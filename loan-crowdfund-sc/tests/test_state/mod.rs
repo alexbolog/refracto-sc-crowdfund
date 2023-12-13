@@ -7,7 +7,7 @@ pub const OWNER_ADDRESS_EXPR: &str = "address:owner";
 pub const BENEFICIARY_ADDRESS_EXPR: &str = "address:beneficiary";
 pub const INVESTOR_1_ADDRESS_EXPR: &str = "address:investor1";
 pub const INVESTOR_2_ADDRESS_EXPR: &str = "address:investor2";
-pub const ACCOUNT_BALANCE_EXPR: &str = "100,000,000";
+pub const ACCOUNT_BALANCE_EXPR: &str = "100000000";
 
 pub const USDC_TOKEN_ID_EXPR: &str = "str:USDC-123456";
 pub const USDC_TOKEN_ID: &str = "USDC-123456";

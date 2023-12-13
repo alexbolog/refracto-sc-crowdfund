@@ -4,7 +4,7 @@ use loan_crowdfund_sc::types::crowdfunding_state::{
 
 use crate::test_state::{
     mockups::{MOCKUP_CF_DEFAULT_COVER_MIN_PRINCIPAL, MOCKUP_CF_DEFAULT_COVER_MIN_REPAYMENT},
-    LoanCfTestState, INVESTOR_1_ADDRESS_EXPR,
+    LoanCfTestState, ACCOUNT_BALANCE_EXPR, INVESTOR_1_ADDRESS_EXPR,
 };
 
 #[test]
@@ -44,4 +44,12 @@ fn claim_rewards_yields_correct_amount() {
         1,
         MOCKUP_CF_DEFAULT_COVER_MIN_PRINCIPAL,
     );
+
+    let initial_balance: u64 = ACCOUNT_BALANCE_EXPR
+        .parse()
+        .expect("Failed to parse string to u64");
+    let expected_balance = initial_balance - MOCKUP_CF_DEFAULT_COVER_MIN_PRINCIPAL
+        + MOCKUP_CF_DEFAULT_COVER_MIN_REPAYMENT;
+
+    state.check_address_usdc_balance(INVESTOR_1_ADDRESS_EXPR, &expected_balance.to_string());
 }
