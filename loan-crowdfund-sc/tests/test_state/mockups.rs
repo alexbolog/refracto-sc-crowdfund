@@ -12,7 +12,8 @@ pub const MOCKUP_CF_TIMESTAMP_BEFORE_END: u64 = MOCKUP_CF_END_TIMESTAMP - 1;
 
 pub const MOCKUP_CF_DEFAULT_MIN_PRINCIPAL: u64 = 9000;
 pub const MOCKUP_CF_DEFAULT_MAX_PRINCIPAL: u64 = 10000;
-pub const MOCKUP_CF_DEFAULT_COVER_MIN_PRINCIPAL: u64 = 9001;
+pub const MOCKUP_CF_DEFAULT_COVER_MIN_PRINCIPAL: u64 = 9000;
+pub const MOCKUP_CF_DEFAULT_COVER_MIN_REPAYMENT: u64 = 9000 * 120 / 100;
 
 pub const MOCKUP_CF_DEFAULT_LOAN_DURATION: u64 = 12 * 30 * 24 * 60 * 60; // one year
 
@@ -57,8 +58,12 @@ impl LoanCfTestState {
         )
     }
 
-    pub fn create_default_mockup_in_state(&mut self, project_id: u64, state: &ProjectFundingState) {
-        self.create_mocked_project_explicit_proj_id(project_id);
+    pub fn create_default_mockup_in_state(
+        &mut self,
+        project_id: u64,
+        state: &ProjectFundingState,
+    ) -> String {
+        let repayment_sc_address = self.create_mocked_project_explicit_proj_id(project_id);
         self.whitelist_address(INVESTOR_1_ADDRESS_EXPR);
 
         match state {
@@ -105,8 +110,22 @@ impl LoanCfTestState {
                 todo!()
             }
             ProjectFundingState::Completed => {
-                todo!();
+                self.set_block_timestamp(MOCKUP_CF_TIMESTAMP_AFTER_START);
+                self.invest(
+                    INVESTOR_1_ADDRESS_EXPR,
+                    MOCKUP_CF_DEFAULT_COVER_MIN_PRINCIPAL,
+                    1,
+                );
+                self.set_block_timestamp(MOCKUP_CF_TIMESTAMP_AFTER_END);
+                self.claim_loan_funds(project_id);
+                self.set_block_timestamp(
+                    MOCKUP_CF_TIMESTAMP_AFTER_END + MOCKUP_CF_DEFAULT_LOAN_DURATION + 1,
+                );
+                self.repay_loan(&repayment_sc_address, MOCKUP_CF_DEFAULT_COVER_MIN_REPAYMENT);
+                self.admin_distribute_repayment(project_id);
             }
         }
+
+        repayment_sc_address
     }
 }

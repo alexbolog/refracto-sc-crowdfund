@@ -64,4 +64,12 @@ impl LoanCfTestState {
                 .expect_value(managed_biguint!(expected_total_amount)),
         );
     }
+
+    pub fn check_repayment_rate(&mut self, project_id: u64, expected_repayment_rate: u64) {
+        self.world.sc_query(
+            ScQueryStep::new()
+                .call(self.contract.get_repayment_rate(project_id))
+                .expect_value(managed_biguint!(expected_repayment_rate)),
+        );
+    }
 }
