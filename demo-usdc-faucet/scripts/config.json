@@ -1,6 +1,6 @@
 {
   "address": {
-    "DEVNET": "erd1qqqqqqqqqqqqqpgqc9uqjcp8q8v8lcxvtcuz6hr7zpf42tfk6ppsawfpn5"
+    "DEVNET": "erd1qqqqqqqqqqqqqpgqxz445g0f6l6ryz7dkhlcpkc4752rvawmyl5s30psm0"
   },
   "deploymentArgs": {
     "gasLimit": 85000000,
