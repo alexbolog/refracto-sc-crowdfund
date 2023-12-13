@@ -1,7 +1,10 @@
 use loan_crowdfund_sc::types::crowdfunding_state::ProjectFundingState;
 
 use crate::test_state::{
-    mockups::{MOCKUP_CF_DEFAULT_COVER_MIN_PRINCIPAL, MOCKUP_CF_DEFAULT_COVER_MIN_REPAYMENT},
+    mockups::{
+        MOCKUP_CF_DEFAULT_COVER_MIN_PRINCIPAL, MOCKUP_CF_DEFAULT_COVER_MIN_REPAYMENT,
+        MOCKUP_CF_SMALL_INVESTMENT,
+    },
     LoanCfTestState, ACCOUNT_BALANCE_EXPR, INVESTOR_1_ADDRESS_EXPR,
 };
 
@@ -12,11 +15,7 @@ fn claim_rewards_cancelled_project() {
     state.deploy_contract();
     state.create_default_mockup_in_state(project_id, &ProjectFundingState::CFCancelled);
 
-    state.claim(
-        INVESTOR_1_ADDRESS_EXPR,
-        1,
-        MOCKUP_CF_DEFAULT_COVER_MIN_PRINCIPAL,
-    );
+    state.claim(INVESTOR_1_ADDRESS_EXPR, 1, MOCKUP_CF_SMALL_INVESTMENT);
 
     state.check_address_usdc_balance(INVESTOR_1_ADDRESS_EXPR, ACCOUNT_BALANCE_EXPR);
 }
