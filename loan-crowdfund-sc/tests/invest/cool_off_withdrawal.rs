@@ -1,6 +1,5 @@
 use loan_crowdfund_sc::constants::{
-    ERR_CANNOT_WITHDRAW_IN_CRT_STATE, ERR_COOL_OFF_EXPIRED, ERR_INVESTMENT_NOT_FOUND,
-    ONE_SHARE_DENOMINATION,
+    ERR_CANNOT_WITHDRAW_IN_CRT_STATE, ERR_INVESTMENT_NOT_FOUND, ONE_SHARE_DENOMINATION,
 };
 use multiversx_sc_scenario::rust_biguint;
 
@@ -47,8 +46,6 @@ fn successful_cool_off_withdrawal_with_multiple_investments() {
     state.check_address_usdc_balance(INVESTOR_1_ADDRESS_EXPR, ACCOUNT_BALANCE_EXPR);
 }
 
-//TODO: fix multiple projects being deployed in test env
-#[ignore]
 #[test]
 fn successful_cool_off_withdrawal_with_investment_in_multiple_projects() {
     let mut state = LoanCfTestState::new();

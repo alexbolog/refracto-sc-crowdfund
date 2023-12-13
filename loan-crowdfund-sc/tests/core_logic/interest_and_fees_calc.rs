@@ -1,6 +1,8 @@
 use loan_crowdfund_sc::types::crowdfunding_state::INTEREST_RATE_DENOMINATION;
 
-use crate::test_state::{LoanCfTestState, INVESTOR_1_ADDRESS_EXPR, mockups::MOCKUP_CF_TIMESTAMP_AFTER_START};
+use crate::test_state::{
+    mockups::MOCKUP_CF_TIMESTAMP_AFTER_START, LoanCfTestState, INVESTOR_1_ADDRESS_EXPR,
+};
 
 // interest = 14%
 // principal = 100k
@@ -15,7 +17,7 @@ const ONE_YEAR: u64 = 12 * 30 * 24 * 3600;
 fn correct_interest_calculation() {
     let project_id = 1;
     let apr = 14;
-    let daily_interest_rate = INTEREST_RATE_DENOMINATION * apr / 365_00; // 365 days * 100
+    let daily_interest_rate = INTEREST_RATE_DENOMINATION * apr / (365 * 100); // 365 days * 100
 
     let days = 10;
     let total_principal = 100_000;
@@ -49,7 +51,7 @@ fn correct_interest_calculation() {
 fn correct_late_fees_calculation() {
     let project_id = 1;
     let penalty_apr = 5;
-    let daily_penalty_rate = INTEREST_RATE_DENOMINATION * penalty_apr / 365_00; // 365 days * 100
+    let daily_penalty_rate = INTEREST_RATE_DENOMINATION * penalty_apr / (365 * 100); // 365 days * 100
 
     let days = 10;
     let total_principal = 100_000;
@@ -82,10 +84,10 @@ fn interest_and_late_fees_applied_correctly() {
     let project_id = 1;
 
     let interest_apr = 14;
-    let interest_per_day = INTEREST_RATE_DENOMINATION * interest_apr / 365_00; // 365 days * 100
+    let interest_per_day = INTEREST_RATE_DENOMINATION * interest_apr / (365 * 100); // 365 days * 100
 
     let penalty_apr = 5;
-    let daily_penalty_rate = INTEREST_RATE_DENOMINATION * penalty_apr / 365_00; // 365 days * 100
+    let daily_penalty_rate = INTEREST_RATE_DENOMINATION * penalty_apr / (365 * 100); // 365 days * 100
 
     let days_late = 10;
     let total_principal = 100_000;

@@ -6,10 +6,10 @@ pub const INTEREST_RATE_DENOMINATION: u64 = 1_000_000_000;
 #[derive(TopEncode, TopDecode, TypeAbi, ManagedVecItem, NestedDecode, NestedEncode)]
 pub struct CrowdfundingStateContext<M: ManagedTypeApi> {
     pub project_id: u64,
-    pub project_name: ManagedBuffer<M>, // maybe?
+    pub project_name: ManagedBuffer<M>, // good to easier identify what's going on
     pub project_payment_token: TokenIdentifier<M>,
 
-    pub daily_interest_rate: u64, // dobanda zilnica
+    pub daily_interest_rate: u64,
     pub daily_penalty_fee_rate: u64,
     pub developer_wallet: ManagedAddress<M>,
 
@@ -33,6 +33,7 @@ pub struct CrowdfundingStateContext<M: ManagedTypeApi> {
 }
 
 impl<M: ManagedTypeApi> CrowdfundingStateContext<M> {
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         project_id: u64,
         project_name: ManagedBuffer<M>,
@@ -76,31 +77,48 @@ impl<M: ManagedTypeApi> CrowdfundingStateContext<M> {
         &self,
         amount_cooling_off: &BigUint<M>,
         block_timestamp: u64,
+        repayment_sc_balance: &BigUint<M>,
     ) -> ProjectFundingState {
         if self.is_cancelled {
             return ProjectFundingState::CFCancelled;
         }
+        if self.is_repayed {
+            return ProjectFundingState::Completed;
+        }
 
-        if self.is_loan_active {
+        let loan_repayment_deadline_timestamp = self.get_expected_loan_repayment_timestamp();
+
+        if self.is_loan_active && block_timestamp <= loan_repayment_deadline_timestamp {
             return ProjectFundingState::LoanActive;
         }
 
-        if self.is_repayed {
-            return ProjectFundingState::Completed;
+        if self.is_loan_active
+            && block_timestamp > loan_repayment_deadline_timestamp
+            && repayment_sc_balance == &0
+        {
+            return ProjectFundingState::LoanRepaymentRunningLate;
+        }
+
+        if self.is_loan_active
+            && block_timestamp > loan_repayment_deadline_timestamp
+            && repayment_sc_balance > &0
+        {
+            return ProjectFundingState::LoanRepaidNotComplete;
         }
 
         if block_timestamp < self.cf_start_timestamp {
             return ProjectFundingState::Pending;
         }
 
-        if block_timestamp >= self.cf_start_timestamp && block_timestamp <= self.cf_end_timestamp {
-            if &self.cf_progress < &self.cf_target_min {
-                return ProjectFundingState::CFActive;
-            }
+        if block_timestamp >= self.cf_start_timestamp
+            && block_timestamp <= self.cf_end_timestamp
+            && self.cf_progress < self.cf_target_min
+        {
+            return ProjectFundingState::CFActive;
         }
 
         if block_timestamp > self.cf_end_timestamp {
-            if &self.cf_progress < &self.cf_target_min {
+            if self.cf_progress < self.cf_target_min {
                 return ProjectFundingState::CFFailed;
             } else if &self.cf_progress - amount_cooling_off >= self.cf_target_min {
                 return ProjectFundingState::CFSuccessful;
@@ -119,14 +137,11 @@ impl<M: ManagedTypeApi> CrowdfundingStateContext<M> {
 
         let days = (block_timestamp - self.loan_start_timestamp) / (24 * 3600);
 
-        let interest = self
-            .cf_progress
+        self.cf_progress
             .clone()
             .mul(self.daily_interest_rate)
             .mul(days)
-            .div(INTEREST_RATE_DENOMINATION);
-
-        interest
+            .div(INTEREST_RATE_DENOMINATION)
     }
 
     pub fn get_expected_loan_repayment_timestamp(&self) -> u64 {
@@ -141,14 +156,11 @@ impl<M: ManagedTypeApi> CrowdfundingStateContext<M> {
 
         let days = (block_timestamp - expected_loan_repayment_timestamp) / (24 * 3600);
 
-        let penalty = self
-            .cf_progress
+        self.cf_progress
             .clone()
             .mul(self.daily_penalty_fee_rate)
             .mul(days)
-            .div(INTEREST_RATE_DENOMINATION);
-
-        penalty
+            .div(INTEREST_RATE_DENOMINATION)
     }
 
     pub fn get_total_amount_due(&self, block_timestamp: u64) -> BigUint<M> {
@@ -161,12 +173,12 @@ impl<M: ManagedTypeApi> CrowdfundingStateContext<M> {
     pub fn get_repayment_rate(&self, repayment_amount: &BigUint<M>) -> BigUint<M> {
         repayment_amount * INTEREST_RATE_DENOMINATION / &self.cf_progress
     }
+
+    pub fn get_repaid_amount(&self, repayment_rate: &BigUint<M>) -> BigUint<M> {
+        &self.cf_progress * repayment_rate / INTEREST_RATE_DENOMINATION
+    }
 }
 
-// Todo: impl getTotalSupply based on cf_progress and share_price_unit
-
-// user -> trimite bani la escrow -> escrow cumpara shares ca proxy
-// bot -> call escrow to release shares to user
 #[derive(TopEncode, TopDecode, TypeAbi, NestedDecode, NestedEncode, PartialEq, Eq, Clone)]
 pub enum ProjectFundingState {
     Invalid = 0,
@@ -177,13 +189,7 @@ pub enum ProjectFundingState {
     CFFailed = 5,
     CFCancelled = 6,
     LoanActive = 7,
-    Completed = 8,
+    LoanRepaymentRunningLate = 8,
+    LoanRepaidNotComplete = 9,
+    Completed = 10,
 }
-
-// claim:
-// claim repayment + interest
-// claim funds back (if CF failed or cancelled)
-
-// 2 phases:
-// - crowdfunding
-// - loan repayment

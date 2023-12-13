@@ -1,20 +1,12 @@
 use loan_crowdfund_sc::{
     admin::ProxyTrait as _, beneficiary::ProxyTrait as _, constants::COOL_OFF_PERIOD,
-    kyc::ProxyTrait as _, storage::config::ProxyTrait as _, ProxyTrait,
+    kyc::ProxyTrait as _, ProxyTrait,
 };
 use loan_refund_escrow_sc::ProxyTrait as _;
-use multiversx_sc::{
-    err_msg,
-    types::{Address, TokenIdentifier},
-};
+use multiversx_sc::types::Address;
 use multiversx_sc_scenario::{
-    api::StaticApi,
-    managed_address, managed_buffer, managed_token_id,
-    scenario_model::{
-        Account, AddressValue, CheckStateStep, ScCallStep, ScDeployStep, ScQueryStep, SetStateStep,
-        TxExpect,
-    },
-    ContractInfo, ScenarioWorld,
+    managed_address, managed_token_id,
+    scenario_model::{Account, AddressValue, ScCallStep, ScDeployStep, SetStateStep, TxExpect},
 };
 use num_bigint::BigUint;
 
@@ -26,6 +18,7 @@ use super::{
     USDC_TOKEN_ID_EXPR,
 };
 
+#[allow(dead_code)]
 impl LoanCfTestState {
     pub fn new() -> Self {
         let mut world = world();
@@ -35,7 +28,11 @@ impl LoanCfTestState {
                 .new_address(OWNER_ADDRESS_EXPR, 1, LOAN_CF_ADDRESS_EXPR)
                 .put_account(
                     BENEFICIARY_ADDRESS_EXPR,
-                    Account::new().nonce(1).balance(ACCOUNT_BALANCE_EXPR),
+                    Account::new()
+                        .nonce(1)
+                        .balance(ACCOUNT_BALANCE_EXPR)
+                        .esdt_balance(USDC_TOKEN_ID_EXPR, ACCOUNT_BALANCE_EXPR)
+                        .esdt_balance(INVALID_TOKEN_ID_EXPR, ACCOUNT_BALANCE_EXPR),
                 )
                 .put_account(
                     INVESTOR_1_ADDRESS_EXPR,
@@ -108,6 +105,7 @@ impl LoanCfTestState {
                 vec![
                     "ESDTRoleNFTCreate".to_string(),
                     "ESDTRoleNFTAddQuantity".to_string(),
+                    "ESDTRoleNFTBurn".to_string(),
                 ],
             )
             .code(code);
@@ -206,14 +204,29 @@ impl LoanCfTestState {
         );
     }
 
-    pub fn public_distribute_repayment(&mut self, address_expr: &str) {
-        // self.world.sc_call(
-        //     ScCallStep::new()
-        //         .from(address_expr)
-        //         .call(self.contract.distribute_repayment()),
-        // );
+    pub fn public_distribute_repayment(&mut self, address_expr: &str, project_id: u64) {
+        self.world.sc_call(
+            ScCallStep::new()
+                .from(address_expr)
+                .call(self.contract.distribute_repayment(project_id)),
+        );
     }
 
+    pub fn public_distribute_repayment_and_expect_err(
+        &mut self,
+        address_expr: &str,
+        project_id: u64,
+        err_msg: &str,
+    ) {
+        self.world.sc_call(
+            ScCallStep::new()
+                .from(address_expr)
+                .call(self.contract.distribute_repayment(project_id))
+                .expect(TxExpect::err(4, "str:".to_string() + err_msg)),
+        );
+    }
+
+    #[allow(clippy::too_many_arguments)]
     pub fn create_project(
         &mut self,
         project_id: u64,
@@ -228,12 +241,12 @@ impl LoanCfTestState {
         cf_target_min: u64,
         cf_target_max: u64,
         loan_duration: u64,
-    ) {
+    ) -> String {
         let new_repayment_sc_address: &str =
             &("sc:loan_repayment_".to_string() + &project_id.to_string());
         self.world.set_state_step(SetStateStep::new().new_address(
             LOAN_CF_ADDRESS_EXPR,
-            0,
+            project_id - 1,
             new_repayment_sc_address,
         ));
 
@@ -254,6 +267,8 @@ impl LoanCfTestState {
                     loan_duration,
                 ),
             ));
+
+        new_repayment_sc_address.to_owned()
     }
 
     pub fn cancel_project(&mut self, project_id: u64) {
@@ -280,13 +295,14 @@ impl LoanCfTestState {
         );
     }
 
-    pub fn repay_loan(&mut self, project_id: u64, amount: u64) {
-        // self.world.sc_call(
-        //     ScCallStep::new()
-        //         .from(BENEFICIARY_ADDRESS_EXPR)
-        //         .esdt_transfer(USDC_TOKEN_ID_EXPR, 0, amount)
-        //         .call(self.contract.repay_loan(project_id)),
-        // );
+    pub fn repay_loan(&mut self, address_expr: &str, amount: u64) {
+        let mut target_sc = LoanRepaymentContract::new(address_expr);
+        self.world.sc_call(
+            ScCallStep::new()
+                .from(BENEFICIARY_ADDRESS_EXPR)
+                .esdt_transfer(USDC_TOKEN_ID_EXPR, 0, amount)
+                .call(target_sc.deposit_loan_repayment()),
+        );
     }
 
     pub fn whitelist_address(&mut self, address_expr: &str) {

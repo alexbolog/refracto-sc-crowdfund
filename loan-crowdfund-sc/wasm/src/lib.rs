@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                           29
+// Endpoints:                           30
 // Async Callback:                       1
-// Total number of exported functions:  31
+// Total number of exported functions:  32
 
 #![no_std]
 
@@ -27,6 +27,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         withdraw => withdraw
         claim => claim
         distributeRepayment => distribute_repayment
+        getProjectDetails => get_project_details
         addAdmins => add_admins
         removeAdmins => remove_admins
         getIsAddressAdmin => is_address_admin
@@ -43,8 +44,8 @@ multiversx_sc_wasm_adapter::endpoints! {
         create => create_project
         cancel => cancel_project
         adminDistributeRepayment => admin_distribute_repayments
-        setTokenIdentifier => set_token_identifier
         issueAndSetRoles => issue_and_set_roles
+        setTransferRole => set_transfer_role
         claimLoanFunds => claim_loan_funds
         getExpectedInterest => get_expected_interest
         getExpectedLateFees => get_expected_late_fees

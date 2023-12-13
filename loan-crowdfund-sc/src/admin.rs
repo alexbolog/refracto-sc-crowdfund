@@ -8,6 +8,7 @@ pub trait AdminModule:
     + crate::storage::config::ConfigModule
     + crate::storage::payments::PaymentsModule
     + crate::common::CommonModule
+    + crate::interactors::loan_repayment_sc_interactor::LoanRepaymentScInteractor
 {
     #[endpoint(create)]
     fn create_project(

@@ -1,7 +1,8 @@
 use crate::test_state::{
     mockups::{
-        MOCKUP_CF_DEFAULT_COVER_MIN_PRINCIPAL, MOCKUP_CF_TIMESTAMP_AFTER_END,
-        MOCKUP_CF_TIMESTAMP_AFTER_START, MOCKUP_CF_TIMESTAMP_BEFORE_END,
+        MOCKUP_CF_DEFAULT_COVER_MIN_PRINCIPAL, MOCKUP_CF_DEFAULT_LOAN_DURATION,
+        MOCKUP_CF_TIMESTAMP_AFTER_END, MOCKUP_CF_TIMESTAMP_AFTER_START,
+        MOCKUP_CF_TIMESTAMP_BEFORE_END,
     },
     LoanCfTestState, INVESTOR_1_ADDRESS_EXPR,
 };
@@ -100,9 +101,8 @@ fn funding_state_loan_active() {
     state.check_funding_state(1, ProjectFundingState::LoanActive);
 }
 
-#[ignore]
 #[test]
-fn funding_state_completed() {
+fn funding_state_loan_repayment_running_late() {
     let mut state = LoanCfTestState::new();
     state.deploy_contract();
     state.create_fully_mocked_project();
@@ -115,9 +115,56 @@ fn funding_state_completed() {
         1,
     );
     state.set_block_timestamp(MOCKUP_CF_TIMESTAMP_AFTER_END);
+
     state.claim_loan_funds(1);
 
-    state.repay_loan(1, 11000);
+    state.set_block_timestamp(MOCKUP_CF_TIMESTAMP_AFTER_END + MOCKUP_CF_DEFAULT_LOAN_DURATION + 1);
+
+    state.check_funding_state(1, ProjectFundingState::LoanRepaymentRunningLate);
+}
+
+#[test]
+fn funding_state_repaid_not_completed() {
+    let mut state = LoanCfTestState::new();
+    state.deploy_contract();
+
+    let repayment_sc_address = state.create_fully_mocked_project();
+
+    state.whitelist_address(INVESTOR_1_ADDRESS_EXPR);
+
+    state.set_block_timestamp(MOCKUP_CF_TIMESTAMP_AFTER_START);
+    state.invest(
+        INVESTOR_1_ADDRESS_EXPR,
+        MOCKUP_CF_DEFAULT_COVER_MIN_PRINCIPAL,
+        1,
+    );
+    state.set_block_timestamp(MOCKUP_CF_TIMESTAMP_AFTER_END);
+    state.claim_loan_funds(1);
+    state.set_block_timestamp(MOCKUP_CF_TIMESTAMP_AFTER_END + MOCKUP_CF_DEFAULT_LOAN_DURATION + 1);
+    state.repay_loan(&repayment_sc_address, 11000);
+
+    state.check_funding_state(1, ProjectFundingState::LoanRepaidNotComplete);
+}
+
+#[test]
+fn funding_state_completed() {
+    let mut state = LoanCfTestState::new();
+    state.deploy_contract();
+
+    let repayment_sc_address = state.create_fully_mocked_project();
+
+    state.whitelist_address(INVESTOR_1_ADDRESS_EXPR);
+
+    state.set_block_timestamp(MOCKUP_CF_TIMESTAMP_AFTER_START);
+    state.invest(
+        INVESTOR_1_ADDRESS_EXPR,
+        MOCKUP_CF_DEFAULT_COVER_MIN_PRINCIPAL,
+        1,
+    );
+    state.set_block_timestamp(MOCKUP_CF_TIMESTAMP_AFTER_END);
+    state.claim_loan_funds(1);
+    state.set_block_timestamp(MOCKUP_CF_TIMESTAMP_AFTER_END + MOCKUP_CF_DEFAULT_LOAN_DURATION + 1);
+    state.repay_loan(&repayment_sc_address, 11000);
     state.admin_distribute_repayment(1);
 
     state.check_funding_state(1, ProjectFundingState::Completed);

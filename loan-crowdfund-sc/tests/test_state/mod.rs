@@ -1,11 +1,5 @@
-use loan_crowdfund_sc::{admin::ProxyTrait as _, beneficiary::ProxyTrait as _, ProxyTrait};
 use multiversx_sc::types::Address;
-use multiversx_sc_scenario::{
-    api::StaticApi,
-    managed_buffer, managed_token_id,
-    scenario_model::{Account, AddressValue, ScCallStep, ScDeployStep, SetStateStep},
-    ContractInfo, ScenarioWorld,
-};
+use multiversx_sc_scenario::{api::StaticApi, ContractInfo, ScenarioWorld};
 
 pub const LOAN_CF_ADDRESS_EXPR: &str = "sc:loan-cf-address";
 pub const LOAN_REPAYMENT_SC_ADDRESS_EXPR: &str = "sc:loan-repayment-source-sc-address";
@@ -13,7 +7,7 @@ pub const OWNER_ADDRESS_EXPR: &str = "address:owner";
 pub const BENEFICIARY_ADDRESS_EXPR: &str = "address:beneficiary";
 pub const INVESTOR_1_ADDRESS_EXPR: &str = "address:investor1";
 pub const INVESTOR_2_ADDRESS_EXPR: &str = "address:investor2";
-pub const ACCOUNT_BALANCE_EXPR: &str = "100,000,000";
+pub const ACCOUNT_BALANCE_EXPR: &str = "100000000";
 
 pub const USDC_TOKEN_ID_EXPR: &str = "str:USDC-123456";
 pub const USDC_TOKEN_ID: &str = "USDC-123456";

@@ -1,3 +1,4 @@
+multiversx_sc::imports!();
 use crate::{
     constants::{
         COOL_OFF_PERIOD, ERR_INSUFFICIENT_REPAYMENT_AMOUNT, ERR_REPAYMENT_DISTRIBUTED,
@@ -6,12 +7,11 @@ use crate::{
     types::crowdfunding_state::{CrowdfundingStateContext, ProjectFundingState},
 };
 
-multiversx_sc::imports!();
-use loan_refund_escrow_sc::ProxyTrait as _;
-
 #[multiversx_sc::module]
 pub trait CommonModule:
-    crate::storage::config::ConfigModule + crate::storage::payments::PaymentsModule
+    crate::storage::config::ConfigModule
+    + crate::storage::payments::PaymentsModule
+    + crate::interactors::loan_repayment_sc_interactor::LoanRepaymentScInteractor
 {
     #[view(getExpectedInterest)]
     fn get_expected_interest(&self, project_id: u64) -> BigUint {
@@ -28,6 +28,12 @@ pub trait CommonModule:
     #[view(getTotalAmount)]
     fn get_total_amount(&self, project_id: u64) -> BigUint {
         let state = self.crowdfunding_state(project_id).get();
+        if state.is_repayed {
+            let repayment_rate = self.repayment_rates(project_id).get();
+
+            return state.get_repaid_amount(&repayment_rate);
+        }
+
         state.get_total_amount_due(self.blockchain().get_block_timestamp())
     }
 
@@ -37,9 +43,14 @@ pub trait CommonModule:
             return ProjectFundingState::Invalid;
         }
 
-        self.crowdfunding_state(project_id).get().get_funding_state(
+        let cf_state = self.crowdfunding_state(project_id).get();
+        let repayment_sc_balance =
+            self.get_repayment_funds_balance(cf_state.repayment_contract_address.clone());
+
+        cf_state.get_funding_state(
             &self.get_aggregated_cool_off_amount(project_id),
             self.blockchain().get_block_timestamp(),
+            &repayment_sc_balance,
         )
     }
 
@@ -58,6 +69,11 @@ pub trait CommonModule:
         aggregated_cool_off_amount
     }
 
+    #[view(getRepaymentRate)]
+    fn get_repayment_rate(&self, project_id: u64) -> BigUint {
+        self.repayment_rates(project_id).get()
+    }
+
     fn process_payment_distribution(
         &self,
         cf_state: &mut CrowdfundingStateContext<Self::Api>,
@@ -67,11 +83,8 @@ pub trait CommonModule:
             self.repayment_rates(cf_state.project_id).is_empty(),
             ERR_REPAYMENT_DISTRIBUTED
         );
-
-        let repayment_amount: BigUint = self
-            .repayment_sc_proxy(cf_state.repayment_contract_address.clone())
-            .withdraw_repayment_funds()
-            .execute_on_dest_context();
+        let repayment_amount: BigUint =
+            self.withdraw_repayment_funds(cf_state.repayment_contract_address.clone());
 
         require!(
             min_allowed_amount <= &repayment_amount,
@@ -94,10 +107,9 @@ pub trait CommonModule:
         let token = self.loan_share_token_identifier().get();
         let amount = &self.get_max_shares_supply(cf_max_target, price_per_share)
             * &BigUint::from(ONE_SHARE_DENOMINATION);
-        let nonce = self
-            .send()
-            .esdt_nft_create_compact_named(&token, &amount, project_name, b"");
-        nonce
+
+        self.send()
+            .esdt_nft_create_compact_named(&token, &amount, project_name, b"")
     }
 
     fn get_max_shares_supply(&self, cf_max_target: &BigUint, price_per_share: &BigUint) -> BigUint {
@@ -112,10 +124,4 @@ pub trait CommonModule:
     ) {
         self.send().esdt_local_burn(token_identifier, nonce, amount);
     }
-
-    #[proxy]
-    fn repayment_sc_proxy(
-        &self,
-        sc_address: ManagedAddress,
-    ) -> loan_refund_escrow_sc::Proxy<Self::Api>;
 }

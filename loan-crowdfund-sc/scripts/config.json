@@ -1,6 +1,6 @@
 {
   "address": {
-    "DEVNET": "erd1qqqqqqqqqqqqqpgqc4zs6lyfxutp4a0u293dsemne07xmgrv6ppszrjd48"
+    "DEVNET": "erd1qqqqqqqqqqqqqpgqstmt3l73fyqt087p5cdhtvmc2yhyfsr0yl5sauaw4w"
   },
   "deploymentArgs": {
     "gasLimit": 85000000,
@@ -10,7 +10,7 @@
       {
         "name": "source repayment address",
         "type": "ManagedAddress",
-        "value": "erd1qqqqqqqqqqqqqpgqqua9nxjzvf39t6tuy55ak2ygk4luc3kf6pps2q3eyg"
+        "value": "erd1qqqqqqqqqqqqqpgq8jhzl0srel9k9x34t7pjwew86wv80n0pyl5smtnt7t"
       }
     ],
     "MAINNET": []
