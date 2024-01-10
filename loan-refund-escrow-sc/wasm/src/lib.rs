@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                            5
+// Endpoints:                            6
 // Async Callback (empty):               1
-// Total number of exported functions:   7
+// Total number of exported functions:   8
 
 #![no_std]
 
@@ -24,6 +24,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         init => init
         depositLoanRepayment => deposit_loan_repayment
         withdrawRepaymentFunds => withdraw_repayment_funds
+        getRepaymentFundsBalance => get_repayment_funds_balance
         getProjectId => project_id
         getDeveloperWalletAddress => developer_wallet_address
         getLoanRepaymentTokenId => loan_repayment_token_id
