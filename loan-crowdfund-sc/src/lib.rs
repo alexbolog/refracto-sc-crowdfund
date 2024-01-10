@@ -38,7 +38,7 @@ pub trait LoanCrowdfundScContract:
 {
     #[init]
     fn init(&self, source_loan_repayment_sc_address: ManagedAddress) {
-        self.source_loan_repayment_sc_address()
+        self.template_loan_repayment_sc_address()
             .set(&source_loan_repayment_sc_address);
     }
 
@@ -66,7 +66,7 @@ pub trait LoanCrowdfundScContract:
 
     #[view(getDebugSourceRepaymentSc)]
     fn get_source_repayment_sc(&self) -> ManagedAddress {
-        self.source_loan_repayment_sc_address().get()
+        self.template_loan_repayment_sc_address().get()
     }
 
     #[payable("*")]

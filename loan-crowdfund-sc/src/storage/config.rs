@@ -21,5 +21,5 @@ pub trait ConfigModule {
 
     #[view(getSourceLoanRepaymentScAddress)]
     #[storage_mapper("source_loan_repayment_sc_address")]
-    fn source_loan_repayment_sc_address(&self) -> SingleValueMapper<ManagedAddress>;
+    fn template_loan_repayment_sc_address(&self) -> SingleValueMapper<ManagedAddress>;
 }

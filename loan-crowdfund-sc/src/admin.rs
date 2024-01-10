@@ -140,7 +140,7 @@ pub trait AdminModule:
         repayment_token_id: &TokenIdentifier,
     ) -> ManagedAddress {
         let code_metadata = CodeMetadata::all();
-        let source_address = self.source_loan_repayment_sc_address().get();
+        let source_address = self.template_loan_repayment_sc_address().get();
         let mut args = ManagedArgBuffer::new();
         args.push_arg(project_id);
         args.push_arg(developer_wallet);
