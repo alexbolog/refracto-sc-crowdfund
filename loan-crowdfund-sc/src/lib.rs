@@ -1,7 +1,7 @@
 #![no_std]
 
 use constants::ONE_SHARE_DENOMINATION;
-use types::crowdfunding_state::CrowdfundingStateContext;
+use types::crowdfunding_state::{CrowdfundingStateContext, ProjectFundingState};
 
 use crate::{
     constants::{
@@ -44,9 +44,7 @@ pub trait LoanCrowdfundScContract:
 
     #[only_owner]
     #[endpoint(upgrade)]
-    fn upgrade(&self, _template_loan_repayment_sc_address: ManagedAddress) {
-
-    }
+    fn upgrade(&self, _template_loan_repayment_sc_address: ManagedAddress) {}
 
     #[payable("*")]
     #[endpoint(invest)]
@@ -111,9 +109,12 @@ pub trait LoanCrowdfundScContract:
         let payment = self.get_loan_share_payment_or_fail();
         let cf_state = self.get_project_by_nonce_or_fail(payment.token_nonce);
 
-        self.require_can_claim_in_current_state(&cf_state);
-        let refund_amount = match cf_state.is_cancelled {
-            true => &payment.amount * &cf_state.share_price_per_unit,
+        let state = self.require_can_claim_in_current_state(&cf_state);
+        let refund_amount = match cf_state.is_cancelled || state == ProjectFundingState::CFFailed {
+            true => {
+                &payment.amount * &cf_state.share_price_per_unit
+                    / BigUint::from(ONE_SHARE_DENOMINATION)
+            }
             false => match self.repayment_rates(cf_state.project_id).is_empty() {
                 true => BigUint::zero(),
                 false => {
@@ -294,7 +295,10 @@ pub trait LoanCrowdfundScContract:
         );
     }
 
-    fn require_can_claim_in_current_state(&self, cf_state: &CrowdfundingStateContext<Self::Api>) {
+    fn require_can_claim_in_current_state(
+        &self,
+        cf_state: &CrowdfundingStateContext<Self::Api>,
+    ) -> ProjectFundingState {
         let repayment_sc_balance =
             self.get_repayment_funds_balance(cf_state.repayment_contract_address.clone());
         let state = cf_state.get_funding_state(
@@ -306,6 +310,8 @@ pub trait LoanCrowdfundScContract:
             CF_STATES_ALLOWING_CLAIMING.contains(&state),
             ERR_CANNOT_CLAIM_IN_CRT_STATE
         );
+
+        state
     }
 
     fn require_withdraw_is_possible(

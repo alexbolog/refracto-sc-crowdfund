@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                           31
+// Endpoints:                           32
 // Async Callback:                       1
-// Total number of exported functions:  33
+// Total number of exported functions:  34
 
 #![no_std]
 #![allow(internal_features)]
@@ -44,6 +44,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         adminDistributeRepayment => admin_distribute_repayments
         issueAndSetRoles => issue_and_set_roles
         setTransferRole => set_transfer_role
+        upgradeRepaymentSc => upgrade_repayment_sc
         claimLoanFunds => claim_loan_funds
         getExpectedInterest => get_expected_interest
         getExpectedLateFees => get_expected_late_fees

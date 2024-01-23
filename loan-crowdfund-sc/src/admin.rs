@@ -119,6 +119,29 @@ pub trait AdminModule:
             .call_and_exit();
     }
 
+    #[only_owner]
+    #[endpoint(upgradeRepaymentSc)]
+    fn upgrade_repayment_sc(&self, project_id: u64) {
+        let code_metadata = CodeMetadata::all();
+        let source_address = self.template_loan_repayment_sc_address().get();
+        let mut args = ManagedArgBuffer::new();
+
+        let project = self.crowdfunding_state(project_id).get();
+
+        args.push_arg(project_id);
+        args.push_arg(project.developer_wallet);
+        args.push_arg(project.project_payment_token);
+
+        self.send_raw().upgrade_from_source_contract(
+            &project.repayment_contract_address,
+            self.blockchain().get_gas_left() - 1_500_000,
+            &BigUint::zero(),
+            &source_address,
+            code_metadata,
+            &args,
+        );
+    }
+
     #[callback]
     fn issue_and_set_roles_callback(
         &self,

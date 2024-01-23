@@ -18,6 +18,16 @@ pub trait LoanRefundEscrowScContract {
             .set_if_empty(loan_repayment_token_id);
     }
 
+    #[only_owner]
+    #[endpoint(upgrade)]
+    fn upgrade(
+        &self,
+        _project_id: u64,
+        _developer_wallet_address: ManagedAddress,
+        _loan_repayment_token_id: TokenIdentifier,
+    ) {
+    }
+
     #[payable("*")]
     #[endpoint(depositLoanRepayment)]
     fn deposit_loan_repayment(&self) {
