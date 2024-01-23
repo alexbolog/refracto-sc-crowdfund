@@ -3,8 +3,9 @@ use crate::types::crowdfunding_state::ProjectFundingState;
 pub const COOL_OFF_PERIOD: u64 = 3600 * 24 * 14; // 14 days
 pub const ONE_SHARE_DENOMINATION: u64 = 1_000_000_000_000_000_000;
 
-pub const CF_STATES_ALLOWING_CLAIMING: [ProjectFundingState; 2] = [
+pub const CF_STATES_ALLOWING_CLAIMING: [ProjectFundingState; 3] = [
     ProjectFundingState::CFCancelled,
+    ProjectFundingState::CFFailed,
     ProjectFundingState::Completed,
 ];
 
