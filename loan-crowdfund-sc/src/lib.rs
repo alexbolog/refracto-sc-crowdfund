@@ -37,9 +37,15 @@ pub trait LoanCrowdfundScContract:
     + interactors::loan_repayment_sc_interactor::LoanRepaymentScInteractor
 {
     #[init]
-    fn init(&self, source_loan_repayment_sc_address: ManagedAddress) {
+    fn init(&self, template_loan_repayment_sc_address: ManagedAddress) {
         self.template_loan_repayment_sc_address()
-            .set(&source_loan_repayment_sc_address);
+            .set(&template_loan_repayment_sc_address);
+    }
+
+    #[only_owner]
+    #[endpoint(upgrade)]
+    fn upgrade(&self, _template_loan_repayment_sc_address: ManagedAddress) {
+
     }
 
     #[payable("*")]
