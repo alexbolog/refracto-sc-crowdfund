@@ -184,12 +184,12 @@ pub enum ProjectFundingState {
     Invalid = 0,
     Pending = 1,
     CFActive = 2,
-    CFWaitingCooloff = 3,
+    CFWaitingCooloff = 3, // CF target reached, waiting for cool off period to end for all investors
     CFSuccessful = 4,
     CFFailed = 5,
     CFCancelled = 6,
     LoanActive = 7,
     LoanRepaymentRunningLate = 8,
-    LoanRepaidNotComplete = 9,
-    Completed = 10,
+    LoanRepaidNotComplete = 9, // repaid but not all funds withdrawn
+    Completed = 10,            // repaid and all funds withdrawn
 }
