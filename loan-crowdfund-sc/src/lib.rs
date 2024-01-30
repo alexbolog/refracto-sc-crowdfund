@@ -1,7 +1,10 @@
 #![no_std]
 
 use constants::ONE_SHARE_DENOMINATION;
-use types::crowdfunding_state::{CrowdfundingStateContext, ProjectFundingState};
+use types::{
+    crowdfunding_state::{CrowdfundingStateContext, ProjectFundingState},
+    crowdfunding_state_ui_context::CrowdfundingStateUiContext,
+};
 
 use crate::{
     constants::{
@@ -186,14 +189,26 @@ pub trait LoanCrowdfundScContract:
     fn get_project_details(
         &self,
         project_ids: MultiValueManagedVec<u64>,
-    ) -> ManagedVec<CrowdfundingStateContext<Self::Api>> {
+    ) -> ManagedVec<CrowdfundingStateUiContext<Self::Api>> {
         let mut result = ManagedVec::new();
         for project_id in project_ids.iter() {
             if self.crowdfunding_state(project_id).is_empty() {
                 continue;
             }
-            let cf_state = self.crowdfunding_state(project_id).get();
-            result.push(cf_state);
+            let internal_cf_project = self.crowdfunding_state(project_id).get();
+
+            let cf_state = internal_cf_project.get_funding_state(
+                &self.get_aggregated_cool_off_amount(project_id),
+                self.blockchain().get_block_timestamp(),
+                &self.get_repayment_funds_balance(
+                    internal_cf_project.repayment_contract_address.clone(),
+                ),
+            );
+
+            result.push(CrowdfundingStateUiContext::new(
+                internal_cf_project,
+                cf_state,
+            ));
         }
         result
     }
