@@ -1,5 +1,8 @@
-use loan_crowdfund_sc::constants::{
-    ERR_CANNOT_WITHDRAW_IN_CRT_STATE, ERR_INVESTMENT_NOT_FOUND, ONE_SHARE_DENOMINATION,
+use loan_crowdfund_sc::{
+    constants::{
+        ERR_CANNOT_WITHDRAW_IN_CRT_STATE, ERR_INVESTMENT_NOT_FOUND, ONE_SHARE_DENOMINATION,
+    },
+    types::crowdfunding_state::ProjectFundingState,
 };
 use multiversx_sc_scenario::rust_biguint;
 
@@ -108,4 +111,18 @@ fn failed_withdrawal_with_merged_investments() {
         &all_shares,
         ERR_INVESTMENT_NOT_FOUND,
     );
+}
+
+#[test]
+fn successful_cool_off_withdrawal_in_cf_active() {
+    let mut state = LoanCfTestState::new();
+    state.deploy_contract();
+    state.create_default_mockup_in_state(1, &ProjectFundingState::CFActive);
+
+    state.invest(INVESTOR_1_ADDRESS_EXPR, 1000, 1);
+    state.set_block_timestamp(MOCKUP_CF_TIMESTAMP_AFTER_START + 1);
+
+    let shares_amount = rust_biguint!(1000) * rust_biguint!(ONE_SHARE_DENOMINATION);
+
+    state.withdraw(INVESTOR_1_ADDRESS_EXPR, 1, &shares_amount);
 }
