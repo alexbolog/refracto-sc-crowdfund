@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                           32
+// Endpoints:                           33
 // Async Callback:                       1
-// Total number of exported functions:  34
+// Total number of exported functions:  35
 
 #![no_std]
 #![allow(internal_features)]
@@ -24,6 +24,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         invest => invest
         getDebugSourceRepaymentSc => get_source_repayment_sc
         withdraw => withdraw
+        claimRefund => claim_refund
         claim => claim
         distributeRepayment => distribute_repayment
         getProjectDetails => get_project_details

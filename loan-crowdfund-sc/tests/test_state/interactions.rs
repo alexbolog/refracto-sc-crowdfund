@@ -204,6 +204,15 @@ impl LoanCfTestState {
         );
     }
 
+    pub fn claim_refund(&mut self, investor_address_expr: &str, shares_nonce: u64, amount: u64) {
+        self.world.sc_call(
+            ScCallStep::new()
+                .from(investor_address_expr)
+                .esdt_transfer(LOAN_SHARES_ID_EXPR, shares_nonce, amount)
+                .call(self.contract.claim_refund()),
+        );
+    }
+
     pub fn public_distribute_repayment(&mut self, address_expr: &str, project_id: u64) {
         self.world.sc_call(
             ScCallStep::new()

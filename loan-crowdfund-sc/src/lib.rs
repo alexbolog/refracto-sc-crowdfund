@@ -1,15 +1,19 @@
 #![no_std]
 
 use constants::ONE_SHARE_DENOMINATION;
-use types::crowdfunding_state::{CrowdfundingStateContext, ProjectFundingState};
+use types::{
+    crowdfunding_state::{CrowdfundingStateContext, ProjectFundingState},
+    crowdfunding_state_ui_context::CrowdfundingStateUiContext,
+};
 
 use crate::{
     constants::{
-        CF_STATES_ALLOWING_CLAIMING, CF_STATES_ALLOWING_INVESTMENT, CF_STATES_ALLOWING_WITHDRAWAL,
-        COOL_OFF_PERIOD, ERR_CANNOT_CLAIM_IN_CRT_STATE, ERR_CANNOT_INVEST_IN_CRT_STATE,
-        ERR_CANNOT_OVER_FINANCE, ERR_CANNOT_WITHDRAW_IN_CRT_STATE, ERR_COOL_OFF_EXPIRED,
-        ERR_INVALID_PAYMENT_NONCE, ERR_INVALID_PAYMENT_TOKEN, ERR_INVALID_PROJECT_ID,
-        ERR_INVESTMENT_NOT_FOUND, ERR_NOTHING_TO_CLAIM,
+        CF_STATES_ALLOWING_CLAIMING_PROFIT, CF_STATES_ALLOWING_CLAIMING_REFUND,
+        CF_STATES_ALLOWING_INVESTMENT, CF_STATES_ALLOWING_WITHDRAWAL, COOL_OFF_PERIOD,
+        ERR_CANNOT_CLAIM_IN_CRT_STATE, ERR_CANNOT_INVEST_IN_CRT_STATE, ERR_CANNOT_OVER_FINANCE,
+        ERR_CANNOT_WITHDRAW_IN_CRT_STATE, ERR_COOL_OFF_EXPIRED, ERR_INVALID_PAYMENT_NONCE,
+        ERR_INVALID_PAYMENT_TOKEN, ERR_INVALID_PROJECT_ID, ERR_INVESTMENT_NOT_FOUND,
+        ERR_NOTHING_TO_CLAIM,
     },
     types::crowdfunding_state::INTEREST_RATE_DENOMINATION,
 };
@@ -53,7 +57,12 @@ pub trait LoanCrowdfundScContract:
         self.require_address_is_kyc_compliant(&caller);
 
         let mut cf_state = self.get_project_by_id_or_fail(project_id);
-        self.require_can_invest_in_current_state(&cf_state);
+        self.require_cf_is_in_state(
+            &cf_state,
+            &CF_STATES_ALLOWING_INVESTMENT,
+            ERR_CANNOT_INVEST_IN_CRT_STATE,
+        );
+
         let payment = self.get_invest_payment_or_fail_if_invalid(&cf_state);
 
         let shares = self.get_loan_shares(&cf_state, &payment.amount);
@@ -104,24 +113,52 @@ pub trait LoanCrowdfundScContract:
     }
 
     #[payable("*")]
+    #[endpoint(claimRefund)]
+    fn claim_refund(&self) {
+        let payment = self.get_loan_share_payment_or_fail();
+        let cf_state = self.get_project_by_nonce_or_fail(payment.token_nonce);
+
+        self.require_cf_is_in_state(
+            &cf_state,
+            &CF_STATES_ALLOWING_CLAIMING_REFUND,
+            ERR_CANNOT_CLAIM_IN_CRT_STATE,
+        );
+
+        let refund_amount = &payment.amount * &cf_state.share_price_per_unit
+            / BigUint::from(ONE_SHARE_DENOMINATION);
+
+        require!(refund_amount > 0, ERR_NOTHING_TO_CLAIM);
+
+        self.burn_project_shares(
+            &payment.token_identifier,
+            payment.token_nonce,
+            &payment.amount,
+        );
+        self.send().direct_esdt(
+            &self.blockchain().get_caller(),
+            &cf_state.project_payment_token,
+            0,
+            &refund_amount,
+        );
+    }
+
+    #[payable("*")]
     #[endpoint(claim)]
     fn claim(&self) {
         let payment = self.get_loan_share_payment_or_fail();
         let cf_state = self.get_project_by_nonce_or_fail(payment.token_nonce);
 
-        let state = self.require_can_claim_in_current_state(&cf_state);
-        let refund_amount = match cf_state.is_cancelled || state == ProjectFundingState::CFFailed {
-            true => {
-                &payment.amount * &cf_state.share_price_per_unit
-                    / BigUint::from(ONE_SHARE_DENOMINATION)
+        self.require_cf_is_in_state(
+            &cf_state,
+            &CF_STATES_ALLOWING_CLAIMING_PROFIT,
+            ERR_CANNOT_CLAIM_IN_CRT_STATE,
+        );
+        let refund_amount = match self.repayment_rates(cf_state.project_id).is_empty() {
+            true => BigUint::zero(),
+            false => {
+                self.repayment_rates(cf_state.project_id).get() * &payment.amount
+                    / INTEREST_RATE_DENOMINATION
             }
-            false => match self.repayment_rates(cf_state.project_id).is_empty() {
-                true => BigUint::zero(),
-                false => {
-                    self.repayment_rates(cf_state.project_id).get() * &payment.amount
-                        / INTEREST_RATE_DENOMINATION
-                }
-            },
         };
 
         require!(refund_amount > 0, ERR_NOTHING_TO_CLAIM);
@@ -152,14 +189,26 @@ pub trait LoanCrowdfundScContract:
     fn get_project_details(
         &self,
         project_ids: MultiValueManagedVec<u64>,
-    ) -> ManagedVec<CrowdfundingStateContext<Self::Api>> {
+    ) -> ManagedVec<CrowdfundingStateUiContext<Self::Api>> {
         let mut result = ManagedVec::new();
         for project_id in project_ids.iter() {
             if self.crowdfunding_state(project_id).is_empty() {
                 continue;
             }
-            let cf_state = self.crowdfunding_state(project_id).get();
-            result.push(cf_state);
+            let internal_cf_project = self.crowdfunding_state(project_id).get();
+
+            let cf_state = internal_cf_project.get_funding_state(
+                &self.get_aggregated_cool_off_amount(project_id),
+                self.blockchain().get_block_timestamp(),
+                &self.get_repayment_funds_balance(
+                    internal_cf_project.repayment_contract_address.clone(),
+                ),
+            );
+
+            result.push(CrowdfundingStateUiContext::new(
+                internal_cf_project,
+                cf_state,
+            ));
         }
         result
     }
@@ -295,10 +344,12 @@ pub trait LoanCrowdfundScContract:
         );
     }
 
-    fn require_can_claim_in_current_state(
+    fn require_cf_is_in_state(
         &self,
         cf_state: &CrowdfundingStateContext<Self::Api>,
-    ) -> ProjectFundingState {
+        states: &[ProjectFundingState],
+        err_msg: &str,
+    ) {
         let repayment_sc_balance =
             self.get_repayment_funds_balance(cf_state.repayment_contract_address.clone());
         let state = cf_state.get_funding_state(
@@ -306,12 +357,7 @@ pub trait LoanCrowdfundScContract:
             self.blockchain().get_block_timestamp(),
             &repayment_sc_balance,
         );
-        require!(
-            CF_STATES_ALLOWING_CLAIMING.contains(&state),
-            ERR_CANNOT_CLAIM_IN_CRT_STATE
-        );
-
-        state
+        require!(states.contains(&state), err_msg);
     }
 
     fn require_withdraw_is_possible(
